@@ -1,0 +1,127 @@
+import React, { useState, useContext } from 'react';
+import PropTypes from 'prop-types';
+
+import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
+import { useTheme } from '@mui/material/styles';
+
+import { _langs, _notifications } from '../../_mock';
+
+import { Iconify } from '../../components/iconify';
+import { Main } from './main';
+import { layoutClasses } from '../classes';
+import { NavMobile, NavDesktop } from './nav';
+import { navData } from '../config-nav-dashboard';
+import { Searchbar } from '../components/searchbar';
+import { _workspaces } from '../config-nav-workspace';
+import { MenuButton } from '../components/menu-button';
+import { LayoutSection } from '../core/layout-section';
+import { HeaderSection } from '../core/header-section';
+import { AccountPopover } from '../components/account-popover';
+import { LanguagePopover } from '../components/language-popover';
+
+import { AlertContext } from '../../contexts/AlertContext';
+
+// ----------------------------------------------------------------------
+
+export function DashboardLayout({ sx, children, header }) {
+  const { alertState } = useContext(AlertContext)
+  const theme = useTheme();
+  const [navOpen, setNavOpen] = useState(false);
+
+  const layoutQuery = 'lg';
+
+  return (
+    <LayoutSection
+      headerSection={
+        <HeaderSection
+          layoutQuery={layoutQuery}
+          slotProps={{
+            container: {
+              maxWidth: false,
+              sx: { px: { [layoutQuery]: 5 } },
+            },
+          }}
+          sx={header?.sx}
+          slots={{
+            topArea: (
+              <Alert
+                severity={alertState.severity}
+                sx={{
+                  display: alertState.open ? 'flex' : 'none',
+                  borderRadius: 0,
+                  position: 'fixed',
+                  top: '1rem',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: 9999,
+                  width: 'auto',
+                  maxWidth: '90%',
+                }}
+              >
+                {alertState.message}
+              </Alert>
+            ),
+            leftArea: (
+              <>
+                <MenuButton
+                  onClick={() => setNavOpen(true)}
+                  sx={{
+                    ml: -1,
+                    [theme.breakpoints.up(layoutQuery)]: { display: 'none' },
+                  }}
+                />
+                <NavMobile
+                  data={navData}
+                  open={navOpen}
+                  onClose={() => setNavOpen(false)}
+                  workspaces={_workspaces}
+                />
+              </>
+            ),
+            rightArea: (
+              <Box gap={1} display="flex" alignItems="center">
+                <LanguagePopover data={_langs} />
+                <AccountPopover
+                  data={[
+                    {
+                      label: 'Home',
+                      href: '/',
+                      icon: <Iconify width={22} icon="solar:home-angle-bold-duotone" />,
+                    },
+                  ]}
+                />
+              </Box>
+            ),
+          }}
+        />
+      }
+      sidebarSection={
+        <NavDesktop data={navData} layoutQuery={layoutQuery} workspaces={_workspaces} />
+      }
+      footerSection={null}
+      cssVars={{
+        '--layout-nav-vertical-width': '300px',
+        '--layout-dashboard-content-pt': theme.spacing(1),
+        '--layout-dashboard-content-pb': theme.spacing(8),
+        '--layout-dashboard-content-px': theme.spacing(5),
+      }}
+      sx={{
+        [`& .${layoutClasses.hasSidebar}`]: {
+          [theme.breakpoints.up(layoutQuery)]: {
+            pl: 'var(--layout-nav-vertical-width)',
+          },
+        },
+        ...sx,
+      }}
+    >
+      <Main>{ children }</Main>
+    </LayoutSection>
+  );
+}
+
+DashboardLayout.propTypes = {
+  sx: PropTypes.objectOf(Object),
+  children: PropTypes.node,
+  header: PropTypes.node
+}
