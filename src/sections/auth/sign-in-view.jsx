@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -7,20 +7,36 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { useRouter } from '../../routes/hooks';
 import { Iconify } from '../../components/iconify';
+import { loginUser } from '../../redux/Authentication/AuthRequests';
+
 
 // ----------------------------------------------------------------------
 
 export function SignInView() {
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignIn = useCallback(() => {
-    router.push('/');
-  }, [router]);
+  const { error } = useSelector((state) => state.auth);
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+
+    const result = await dispatch(loginUser({ email, password }));
+
+    if (result.meta.requestStatus === 'fulfilled') {
+      navigate('/');
+    }
+  };
 
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
@@ -28,9 +44,12 @@ export function SignInView() {
         fullWidth
         name="email"
         label="Email address"
-        defaultValue="diyari@gmail.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
+        error={Boolean(error)}
+        helperText={error?.includes("email") ? error : ""}
       />
 
       <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
@@ -41,9 +60,12 @@ export function SignInView() {
         fullWidth
         name="password"
         label="Password"
-        defaultValue="diyari"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         InputLabelProps={{ shrink: true }}
         type={showPassword ? 'text' : 'password'}
+        error={Boolean(error)}
+        helperText={error?.includes("password") ? error : ""}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -82,6 +104,9 @@ export function SignInView() {
       </Box>
 
       {renderForm}
+      {error && !error.includes("email") && !error.includes("password") && (
+        <p className='text-red-500 text-center mt-5'>{error}</p>
+      )}
     </>
   );
 }

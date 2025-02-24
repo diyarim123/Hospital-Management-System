@@ -40,7 +40,7 @@ const PatientsSlice = createSlice({
     });
     builder.addCase(postPatient.rejected, (state, action) => {
       state.patients_loading = false;
-      state.patients_err = action.payload || 'An error occurred while adding a patient.'; // Use action.payload
+      state.patients_err = action.payload || 'An error occurred while adding a patient.';
     });
 
     // Update Patient

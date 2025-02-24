@@ -10,9 +10,12 @@ import MenuList from '@mui/material/MenuList';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { _myAccount } from '../../_mock';
 import { useRouter, usePathname } from '../../routes/hooks';
+import { logout } from "../../redux/Authentication/AuthSlice"
 
 
 // ----------------------------------------------------------------------
@@ -20,6 +23,8 @@ import { useRouter, usePathname } from '../../routes/hooks';
 
 export function AccountPopover({ data = [], sx, ...other }) {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const pathname = usePathname();
 
@@ -40,6 +45,11 @@ export function AccountPopover({ data = [], sx, ...other }) {
     },
     [handleClosePopover, router]
   );
+
+  const handleLogout = () => {
+    dispatch(logout()); // Remove user from Redux and localStorage
+    navigate("/sign-in", { replace: true }); // Redirect to sign-in page
+  };
 
   return (
     <>
@@ -120,7 +130,7 @@ export function AccountPopover({ data = [], sx, ...other }) {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
-          <Button fullWidth color="error" size="medium" variant="text">
+          <Button fullWidth color="error" size="medium" variant="text" onClick={handleLogout}>
             Logout
           </Button>
         </Box>

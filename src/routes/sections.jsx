@@ -1,26 +1,29 @@
-import { lazy, Suspense } from 'react';
-import { Outlet, Navigate, useRoutes } from 'react-router-dom';
+import { lazy, Suspense } from "react";
+import { Outlet, Navigate, useRoutes } from "react-router-dom";
 
-import Box from '@mui/material/Box';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import Box from "@mui/material/Box";
+import LinearProgress, { linearProgressClasses } from "@mui/material/LinearProgress";
 
-import { varAlpha } from '../theme/styles';
-import { AuthLayout } from '../layouts/auth';
-import { DashboardLayout } from '../layouts/dashboard';
-import AddPatient from '../sections/patients/patients-modal';
+import { varAlpha } from "../theme/styles";
+import { AuthLayout } from "../layouts/auth";
+import { DashboardLayout } from "../layouts/dashboard";
 
-// ----------------------------------------------------------------------
-
-export const HomePage = lazy(() => import('../pages/home'));
-export const BlogPage = lazy(() => import('../pages/blog'));
-export const PatientPage = lazy(() => import('../pages/patients'));
-export const SignInPage = lazy(() => import('../pages/sign-in'));
-export const ProductsPage = lazy(() => import('../pages/products'));
-export const Page404 = lazy(() => import('../pages/page-not-found'));
+// Import Protected and Public Routes
+import ProtectedRoute from "./ProtectedRoute";
+import PublicRoute from "./PublicRoute";
 
 // ----------------------------------------------------------------------
 
-// the loading in the screen
+export const HomePage = lazy(() => import("../pages/home"));
+export const BlogPage = lazy(() => import("../pages/blog"));
+export const PatientPage = lazy(() => import("../pages/patients"));
+export const SignInPage = lazy(() => import("../pages/sign-in"));
+export const ProductsPage = lazy(() => import("../pages/products"));
+export const Page404 = lazy(() => import("../pages/page-not-found"));
+
+// ----------------------------------------------------------------------
+
+// Loading screen
 const renderFallback = (
   <Box display="flex" alignItems="center" justifyContent="center" flex="1 1 auto">
     <LinearProgress
@@ -28,7 +31,7 @@ const renderFallback = (
         width: 1,
         maxWidth: 320,
         bgcolor: (theme) => varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
-        [`& .${linearProgressClasses.bar}`]: { bgcolor: 'text.primary' },
+        [`& .${linearProgressClasses.bar}`]: { bgcolor: "text.primary" },
       }}
     />
   </Box>
@@ -36,35 +39,52 @@ const renderFallback = (
 
 export function Router() {
   return useRoutes([
+    // Public Route (Sign In)
     {
-      element: (
-        <DashboardLayout>
-          <Suspense fallback={renderFallback}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
-      ),
+      element: <PublicRoute />, // Redirects logged-in users away from sign-in
       children: [
-        { element: <HomePage />, index: true },
-        { path: 'patients', element: <PatientPage /> },
-        { path: 'products', element: <ProductsPage /> },
-        { path: 'blog', element: <BlogPage /> },
+        {
+          path: "sign-in",
+          element: (
+            <AuthLayout>
+              <SignInPage />
+            </AuthLayout>
+          ),
+        },
       ],
     },
+
+    // Protected Routes (Dashboard and other pages)
     {
-      path: 'sign-in',
-      element: (
-        <AuthLayout>
-          <SignInPage />
-        </AuthLayout>
-      ),
+      element: <ProtectedRoute />, // Protects all dashboard-related pages
+      children: [
+        {
+          element: (
+            <DashboardLayout>
+              <Suspense fallback={renderFallback}>
+                <Outlet />
+              </Suspense>
+            </DashboardLayout>
+          ),
+          children: [
+            { element: <HomePage />, index: true },
+            { path: "patients", element: <PatientPage /> },
+            { path: "products", element: <ProductsPage /> },
+            { path: "blog", element: <BlogPage /> },
+          ],
+        },
+      ],
     },
+
+    // 404 Page
     {
-      path: '404',
+      path: "404",
       element: <Page404 />,
     },
+
+    // Redirect unknown routes to 404
     {
-      path: '*',
+      path: "*",
       element: <Navigate to="/404" replace />,
     },
   ]);
