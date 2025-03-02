@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState, useCallback } from 'react';
+import { useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
@@ -16,6 +17,7 @@ import { Iconify } from '../../components/iconify';
 
 export function WorkspacesPopover({ data = [], sx, ...other }) {
   const [workspace, setWorkspace] = useState(data[0]);
+  const { user, token} = useSelector(state => state.auth);
 
   const [openPopover, setOpenPopover] = useState(null);
 
@@ -39,8 +41,8 @@ export function WorkspacesPopover({ data = [], sx, ...other }) {
     <Box component="img" alt={alt} src={src} sx={{ width: 24, height: 24, borderRadius: '50%' }} />
   );
 
-  const renderLabel = (plan) => (
-    <Label color={plan === 'Free' ? 'default' : 'info'}>{plan}</Label>
+  const renderLabel = (role) => (
+    <Label color={role === 'Admin' ? 'default' : 'info'}>{role}</Label>
   );
 
   return (
@@ -71,8 +73,8 @@ export function WorkspacesPopover({ data = [], sx, ...other }) {
           alignItems="center"
           sx={{ typography: 'body2', fontWeight: 'fontWeightSemiBold' }}
         >
-          {workspace?.name}
-          {renderLabel(workspace?.plan)}
+          {user?.username}
+          {renderLabel(user?.role)}
         </Box>
 
         <Iconify width={16} icon="carbon:chevron-sort" sx={{ color: 'text.disabled' }} />
@@ -104,13 +106,13 @@ export function WorkspacesPopover({ data = [], sx, ...other }) {
               selected={option.id === workspace?.id}
               onClick={() => handleChangeWorkspace(option)}
             >
-              {renderAvatar(option.name, option.logo)}
+              {renderAvatar(user.username, option.logo)}
 
               <Box component="span" sx={{ flexGrow: 1 }}>
                 {option.name}
               </Box>
 
-              {renderLabel(option.plan)}
+              {renderLabel(user.role)}
             </MenuItem>
           ))}
         </MenuList>

@@ -1,5 +1,6 @@
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
+import { useSelector } from 'react-redux';
 
 // you can import _tasks to fulfill
 import { DashboardContent } from '../../../layouts/dashboard';
@@ -16,10 +17,12 @@ import { AnalyticsConversionRates } from '../analytics-conversion-rates';
 // ----------------------------------------------------------------------
 
 export function OverviewAnalyticsView() {
+  const {user, token} = useSelector(state => state.auth);
+
   return (
     <DashboardContent maxWidth="xl">
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
-        Hi, Diyari 👋
+        Hi, {user.username} 👋
       </Typography>
 
       <Grid container spacing={3}>

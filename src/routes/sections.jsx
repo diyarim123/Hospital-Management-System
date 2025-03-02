@@ -18,6 +18,7 @@ export const HomePage = lazy(() => import("../pages/home"));
 export const BlogPage = lazy(() => import("../pages/blog"));
 export const PatientPage = lazy(() => import("../pages/patients"));
 export const SignInPage = lazy(() => import("../pages/sign-in"));
+export const SignUpPage = lazy(() => import("../pages/sign-up"));
 export const ProductsPage = lazy(() => import("../pages/products"));
 export const Page404 = lazy(() => import("../pages/page-not-found"));
 
@@ -39,15 +40,22 @@ const renderFallback = (
 
 export function Router() {
   return useRoutes([
-    // Public Route (Sign In)
     {
-      element: <PublicRoute />, // Redirects logged-in users away from sign-in
+      element: <PublicRoute />,
       children: [
         {
           path: "sign-in",
           element: (
             <AuthLayout>
               <SignInPage />
+            </AuthLayout>
+          ),
+        },
+        {
+          path: "sign-up", // Added Sign Up route here
+          element: (
+            <AuthLayout>
+              <SignUpPage />
             </AuthLayout>
           ),
         },

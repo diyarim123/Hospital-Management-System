@@ -9,18 +9,21 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { Autocomplete } from '@mui/material';
 
-import { useRouter } from '../../routes/hooks';
 import { Iconify } from '../../components/iconify';
-import { loginUser } from '../../redux/Authentication/AuthRequests';
-
+import { registerUser } from '../../redux/Authentication/AuthRequests';
 
 // ----------------------------------------------------------------------
 
-export function SignInView() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const roles = ['Admin', 'Patient', 'Doctor'];
+
+export function SignUpView() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -28,18 +31,33 @@ export function SignInView() {
 
   const { error } = useSelector((state) => state.auth);
 
-  const handleSignIn = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
 
-    const result = await dispatch(loginUser({ email, password }));
+    const result = await dispatch(registerUser({ username, email, password, role }));
 
     if (result.meta.requestStatus === 'fulfilled') {
-      navigate('/');
+      setSuccess('User registered successfully');
+      setTimeout(() => {
+        navigate('/sign-in');
+      }, 1500);
     }
   };
 
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
+      <TextField
+        fullWidth
+        name="username"
+        label="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        InputLabelProps={{ shrink: true }}
+        sx={{ mb: 3 }}
+        error={Boolean(error)}
+        helperText={error?.includes('username') ? error : ''}
+      />
+
       <TextField
         fullWidth
         name="email"
@@ -49,12 +67,8 @@ export function SignInView() {
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
         error={Boolean(error)}
-        helperText={error?.includes("email") ? error : ""}
+        helperText={error?.includes('email') ? error : ''}
       />
-
-      <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-        Forgot password?
-      </Link>
 
       <TextField
         fullWidth
@@ -65,7 +79,7 @@ export function SignInView() {
         InputLabelProps={{ shrink: true }}
         type={showPassword ? 'text' : 'password'}
         error={Boolean(error)}
-        helperText={error?.includes("password") ? error : ""}
+        helperText={error?.includes('password') ? error : ''}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -78,15 +92,33 @@ export function SignInView() {
         sx={{ mb: 3 }}
       />
 
+      <Autocomplete
+        disablePortal
+        options={roles}
+        name="role"
+        value={role}
+        onChange={(event, newValue) => setRole(newValue || '')}
+        sx={{ width: '100%', mb: 3 }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Role"
+            error={error && role === ''}
+            helperText={error && role === '' ? 'This field is required' : ''}
+            required
+          />
+        )}
+      />
+
       <LoadingButton
         fullWidth
         size="large"
         type="submit"
         color="inherit"
         variant="contained"
-        onClick={handleSignIn}
+        onClick={handleSignUp}
       >
-        Sign in
+        Sign up
       </LoadingButton>
     </Box>
   );
@@ -94,18 +126,25 @@ export function SignInView() {
   return (
     <>
       <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
-        <Typography variant="h5">Sign in</Typography>
+        <Typography variant="h5">Sign up</Typography>
         <Typography variant="body2" color="text.secondary">
-          Don’t have an account?
-          <Link href="/sign-up" variant="subtitle2" sx={{ ml: 0.5 }}>
-            Get started
+          Have an account?
+          <Link variant="subtitle2" sx={{ ml: 0.5 }}>
+            Sign in
           </Link>
         </Typography>
       </Box>
 
       {renderForm}
-      {error && !error.includes("email") && !error.includes("password") && (
-        <p className='text-red-500 text-center mt-5'>{error}</p>
+      {error && (
+        <Typography color="error" align="center" sx={{ mt: 2 }}>
+          {error}
+        </Typography>
+      )}
+      {success && (
+        <Typography align="center" sx={{ mt: 2, color: "green" }}>
+          {success}
+        </Typography>
       )}
     </>
   );
