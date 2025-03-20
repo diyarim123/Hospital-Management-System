@@ -3,10 +3,10 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 // URL
-const URL = 'http://127.0.0.1:4000/patients';
+const URL = 'http://127.0.0.1:4000/doctors';
 
-export const getPatients = createAsyncThunk(
-  'patients/fetch',
+export const getDoctors = createAsyncThunk(
+  'doctors/fetch',
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
@@ -24,8 +24,8 @@ export const getPatients = createAsyncThunk(
   }
 );
 
-export const postPatient = createAsyncThunk(
-  'patients/post',
+export const postDoctor = createAsyncThunk(
+  'doctors/post',
   async (data, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
@@ -44,8 +44,8 @@ export const postPatient = createAsyncThunk(
   }
 );
 
-export const deletePatient = createAsyncThunk(
-  'patients/deletePatient',
+export const deleteDoctor = createAsyncThunk(
+  'doctors/deleteDoctor',
   async (id, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store

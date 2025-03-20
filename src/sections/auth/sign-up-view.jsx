@@ -1,5 +1,12 @@
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
+// Toast notifications
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// Material-UI components
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
@@ -7,11 +14,14 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
 import { Autocomplete } from '@mui/material';
 
+// Custom components
 import { Iconify } from '../../components/iconify';
+
+// Redux actions
 import { registerUser } from '../../redux/Authentication/AuthRequests';
 
 // ----------------------------------------------------------------------
@@ -23,7 +33,6 @@ export function SignUpView() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('');
-  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -37,10 +46,19 @@ export function SignUpView() {
     const result = await dispatch(registerUser({ username, email, password, role }));
 
     if (result.meta.requestStatus === 'fulfilled') {
-      setSuccess('User registered successfully');
+      toast.success('User registered successfully', {
+        position: 'top-center',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
       setTimeout(() => {
         navigate('/sign-in');
-      }, 1500);
+      }, 2500);
     }
   };
 
@@ -54,8 +72,8 @@ export function SignUpView() {
         onChange={(e) => setUsername(e.target.value)}
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
-        error={Boolean(error)}
-        helperText={error?.includes('username') ? error : ''}
+        error={error && username === ''}
+        helperText={error && username === '' ? 'This field is required' : ''}
       />
 
       <TextField
@@ -66,8 +84,8 @@ export function SignUpView() {
         onChange={(e) => setEmail(e.target.value)}
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
-        error={Boolean(error)}
-        helperText={error?.includes('email') ? error : ''}
+        error={error && email === ''}
+        helperText={error && email === '' ? 'This field is required' : ''}
       />
 
       <TextField
@@ -78,8 +96,8 @@ export function SignUpView() {
         onChange={(e) => setPassword(e.target.value)}
         InputLabelProps={{ shrink: true }}
         type={showPassword ? 'text' : 'password'}
-        error={Boolean(error)}
-        helperText={error?.includes('password') ? error : ''}
+        error={error && password === ''}
+        helperText={error && password === '' ? 'This field is required' : ''}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -129,7 +147,7 @@ export function SignUpView() {
         <Typography variant="h5">Sign up</Typography>
         <Typography variant="body2" color="text.secondary">
           Have an account?
-          <Link variant="subtitle2" sx={{ ml: 0.5 }}>
+          <Link href="/sign-in" variant="subtitle2" sx={{ ml: 0.5 }}>
             Sign in
           </Link>
         </Typography>
@@ -137,15 +155,11 @@ export function SignUpView() {
 
       {renderForm}
       {error && (
-        <Typography color="error" align="center" sx={{ mt: 2 }}>
-          {error}
-        </Typography>
+        <Stack sx={{ width: '100%', padding: '1rem 0 0 0' }} spacing={2}>
+          <Alert severity="error">{error}</Alert>
+        </Stack>
       )}
-      {success && (
-        <Typography align="center" sx={{ mt: 2, color: "green" }}>
-          {success}
-        </Typography>
-      )}
+      <ToastContainer />
     </>
   );
 }

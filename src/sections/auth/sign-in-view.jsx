@@ -1,5 +1,13 @@
+// React and state management
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
+// Toast notifications
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// Material-UI components
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
@@ -7,20 +15,20 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 
+// Custom hooks and components
 import { useRouter } from '../../routes/hooks';
 import { Iconify } from '../../components/iconify';
-import { loginUser } from '../../redux/Authentication/AuthRequests';
 
+// Redux actions
+import { loginUser } from '../../redux/Authentication/AuthRequests';
 
 // ----------------------------------------------------------------------
 
 export function SignInView() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -34,7 +42,19 @@ export function SignInView() {
     const result = await dispatch(loginUser({ email, password }));
 
     if (result.meta.requestStatus === 'fulfilled') {
-      navigate('/');
+      toast.success('You have successfully logged in', {
+        position: 'top-center',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+      setTimeout(() => {
+        navigate('/');
+      }, 2500);
     }
   };
 
@@ -49,7 +69,7 @@ export function SignInView() {
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
         error={Boolean(error)}
-        helperText={error?.includes("email") ? error : ""}
+        helperText={error?.includes('email') ? error : ''}
       />
 
       <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
@@ -65,7 +85,7 @@ export function SignInView() {
         InputLabelProps={{ shrink: true }}
         type={showPassword ? 'text' : 'password'}
         error={Boolean(error)}
-        helperText={error?.includes("password") ? error : ""}
+        helperText={error?.includes('password') ? error : ''}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -104,9 +124,10 @@ export function SignInView() {
       </Box>
 
       {renderForm}
-      {error && !error.includes("email") && !error.includes("password") && (
-        <p className='text-red-500 text-center mt-5'>{error}</p>
+      {error && !error.includes('email') && !error.includes('password') && (
+        <p className="text-red-500 text-center mt-5">{error}</p>
       )}
+      <ToastContainer />
     </>
   );
 }

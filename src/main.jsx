@@ -9,6 +9,7 @@ import { Provider } from 'react-redux';
 
 // importing the slices
 import PatientsSlice from "./redux/patients/patientsSlice"
+import DoctorsSlice from "./redux/doctors/doctorsSlice"
 import AuthSlice from "./redux/Authentication/AuthSlice"
 
 import App from './app';
@@ -16,6 +17,7 @@ import App from './app';
 const store = configureStore({
   reducer : {
     patients : PatientsSlice,
+    doctors : DoctorsSlice,
     auth: AuthSlice
   }
 })
