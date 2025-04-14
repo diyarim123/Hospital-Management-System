@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 // Toast notifications
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Material-UI components
@@ -127,7 +127,6 @@ export function SignInView() {
       {error && !error.includes('email') && !error.includes('password') && (
         <p className="text-red-500 text-center mt-5">{error}</p>
       )}
-      <ToastContainer />
     </>
   );
 }

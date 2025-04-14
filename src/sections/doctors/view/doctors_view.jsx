@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo} from 'react';
 import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
@@ -106,11 +106,14 @@ export function DoctorsView({ handleModal }) {
     dispatch(getDoctors());
   }, [dispatch]);
 
-  const dataFiltered = applyFilter({
-    inputData: doctors_data.result || [],
-    comparator: getComparator(table.order, table.orderBy),
-    filterName,
-  });
+  const dataFiltered = useMemo(() => 
+    applyFilter({
+      inputData: doctors_data || [],
+      comparator: getComparator(table.order, table.orderBy),
+      filterName,
+    }), 
+    [doctors_data, table, filterName]
+  );
 
   const Modal = isOpen ? <ModalUnstyled isOpen={isOpen} /> : null;
   const notFound = !dataFiltered.length && !!filterName;

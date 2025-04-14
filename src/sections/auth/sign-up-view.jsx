@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 // Toast notifications
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Material-UI components
@@ -14,8 +14,6 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
-import Alert from '@mui/material/Alert';
-import Stack from '@mui/material/Stack';
 import { Autocomplete } from '@mui/material';
 
 // Custom components
@@ -59,6 +57,18 @@ export function SignUpView() {
       setTimeout(() => {
         navigate('/sign-in');
       }, 2500);
+    }
+    if (result.meta.requestStatus === 'rejected') {
+      toast.error('Registration failed!', {
+        position: 'top-center',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
     }
   };
 
@@ -154,12 +164,6 @@ export function SignUpView() {
       </Box>
 
       {renderForm}
-      {error && (
-        <Stack sx={{ width: '100%', padding: '1rem 0 0 0' }} spacing={2}>
-          <Alert severity="error">{error}</Alert>
-        </Stack>
-      )}
-      <ToastContainer />
     </>
   );
 }

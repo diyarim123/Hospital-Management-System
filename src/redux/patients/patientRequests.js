@@ -44,6 +44,26 @@ export const postPatient = createAsyncThunk(
   }
 );
 
+export const updatePatient = createAsyncThunk(
+  'patients/update',
+  async (data, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.token; // Get token from Redux store
+
+      const response = await axios.patch(`${URL}/${data.patient_id}`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Attach token
+        },
+      });
+
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || 'Error updating patient');
+    }
+  }
+);
+
 export const deletePatient = createAsyncThunk(
   'patients/deletePatient',
   async (id, { rejectWithValue, getState }) => {
@@ -60,6 +80,7 @@ export const deletePatient = createAsyncThunk(
       if (!response.ok) {
         throw new Error('Failed to delete patient');
       }
+
 
       return id;
     } catch (error) {

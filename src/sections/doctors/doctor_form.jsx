@@ -1,14 +1,17 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+
+// Toast notifications
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { TextField, Button, Autocomplete } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { postDoctor } from "../../redux/doctors/doctorsRequests";
-import { AlertContext } from '../../contexts/AlertContext';
 
 const GenderOptions = ['Male', 'Female'];
 
-const DoctorForm = () => {
-  const { showAlert } = useContext(AlertContext)
+const DoctorForm = ({isOpen, handleModal}) => {
   const dispatch = useDispatch();
   const [showWarning, setShowWarning] = useState(false);
   const [formData, setFormData] = useState({
@@ -29,19 +32,29 @@ const DoctorForm = () => {
     });
   };
 
-  const handleSubmit = (event) => {
-    const isFormValid = Object.values(formData).every(value => value !== '');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const isFormValid = Object.values(formData).every((value) => value !== '');
 
     if (!isFormValid) {
-      setShowWarning(true); // Show warnings for empty fields
+      setShowWarning(true);
       return;
     }
 
-    try {
-      dispatch(postDoctor(formData));
-      setShowWarning(false);
-    } catch (err) {
-      showAlert('error', 'Could not add doctor!');
+    const result = await dispatch(postDoctor(formData));
+
+    if (result.meta.requestStatus === 'fulfilled') {
+      toast.success('Doctor added successfully', {
+        position: 'top-center',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+      handleModal(false)
     }
   };
 
@@ -167,3 +180,8 @@ const DoctorForm = () => {
 };
 
 export default DoctorForm;
+
+DoctorForm.propTypes = {
+  isOpen: PropTypes.bool,
+  handleModal: PropTypes.func
+}

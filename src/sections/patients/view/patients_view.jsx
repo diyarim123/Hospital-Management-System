@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
@@ -106,11 +106,14 @@ export function PatientsView({ handleModal }) {
     dispatch(getPatients());
   }, [dispatch]);
 
-  const dataFiltered = applyFilter({
-    inputData: patients_data.result || [],
-    comparator: getComparator(table.order, table.orderBy),
-    filterName,
-  });
+  const dataFiltered = useMemo(() => 
+    applyFilter({
+      inputData: patients_data || [],
+      comparator: getComparator(table.order, table.orderBy),
+      filterName,
+    }), 
+    [patients_data, table, filterName]
+  );
 
   const Modal = isOpen ? <ModalUnstyled isOpen={isOpen} /> : null;
   const notFound = !dataFiltered.length && !!filterName;
@@ -118,6 +121,8 @@ export function PatientsView({ handleModal }) {
   const handleRetry = () => {
     dispatch(getPatients());
   };
+  console.log("current patient_data data", patients_data)
+  console.log("filtered data", dataFiltered)
 
   return (
     <DashboardContent>
@@ -173,13 +178,13 @@ export function PatientsView({ handleModal }) {
                   <PatientTableHead
                     order={table.order}
                     orderBy={table.orderBy}
-                    rowCount={patients_data?.result?.length || 0}
+                    rowCount={patients_data?.length || 0}
                     numSelected={table.selected.length}
                     onSort={table.onSort}
                     onSelectAllRows={(checked) =>
                       table.onSelectAllRows(
                         checked,
-                        patients_data?.result?.map((user) => user.id) || []
+                        patients_data?.map((user) => user.id) || []
                       )
                     }
                     headLabel={[
@@ -215,7 +220,7 @@ export function PatientsView({ handleModal }) {
                       emptyRows={emptyRows(
                         table.page,
                         table.rowsPerPage,
-                        patients_data?.result?.length || 0
+                        patients_data?.length || 0
                       )}
                     />
 
@@ -228,7 +233,7 @@ export function PatientsView({ handleModal }) {
             <TablePagination
               component="div"
               page={table.page}
-              count={patients_data?.result?.length || 0}
+              count={patients_data?.length || 0}
               rowsPerPage={table.rowsPerPage}
               onPageChange={table.onChangePage}
               rowsPerPageOptions={[5, 10, 25]}

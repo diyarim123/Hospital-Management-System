@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
+
 import { CONFIG } from '../config-global';
 import { PatientsView } from '../sections/patients/view';
 import PatientModal from '../sections/patients/patients-modal';

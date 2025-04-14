@@ -43,23 +43,23 @@ const DoctorssSlice = createSlice({
       state.doctors_err = action.payload || 'An error occurred while adding a doctor.';
     });
 
-    // Update doctor
+    // Update Doctor
     // builder.addCase(updateDoctor.pending, (state) => {
     //   state.doctors_loading = true;
-    //   state.doctors_err = "";
+    //   state.doctors_err = '';
     // });
     // builder.addCase(updateDoctor.fulfilled, (state, action) => {
     //   state.doctors_loading = false;
     //   state.doctors_data = state.doctors_data.map((doctor) =>
-    //     doctor.id === action.payload.id ? action.payload : doctor
+    //     doctor.doctor_id === action.payload.data.doctor_id ? action.payload.data : doctor
     //   );
     // });
     // builder.addCase(updateDoctor.rejected, (state, action) => {
     //   state.doctors_loading = false;
-    //   state.doctors_err = action.payload;
+    //   state.doctors_err = action.payload.error;
     // });
 
-    // Delete Patient
+    // Delete Doctor
     builder.addCase(deleteDoctor.pending, (state) => {
       state.doctors_loading = true;
       state.doctors_err = '';

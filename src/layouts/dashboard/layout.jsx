@@ -20,12 +20,10 @@ import { HeaderSection } from '../core/header-section';
 import { AccountPopover } from '../components/account-popover';
 import { LanguagePopover } from '../components/language-popover';
 
-import { AlertContext } from '../../contexts/AlertContext';
 
 // ----------------------------------------------------------------------
 
 export function DashboardLayout({ sx, children, header }) {
-  const { alertState } = useContext(AlertContext)
   const theme = useTheme();
   const [navOpen, setNavOpen] = useState(false);
 
@@ -44,24 +42,6 @@ export function DashboardLayout({ sx, children, header }) {
           }}
           sx={header?.sx}
           slots={{
-            topArea: (
-              <Alert
-                severity={alertState.severity}
-                sx={{
-                  display: alertState.open ? 'flex' : 'none',
-                  borderRadius: 0,
-                  position: 'fixed',
-                  top: '1rem',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  zIndex: 9999,
-                  width: 'auto',
-                  maxWidth: '90%',
-                }}
-              >
-                {alertState.message}
-              </Alert>
-            ),
             leftArea: (
               <>
                 <MenuButton

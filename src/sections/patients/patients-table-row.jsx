@@ -1,7 +1,10 @@
 import PropTypes from 'prop-types';
-import { useState, useCallback, useContext } from 'react';
-
+import { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+
+// Toast notifications
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
@@ -11,19 +14,20 @@ import MenuList from '@mui/material/MenuList';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 import { Iconify } from '../../components/iconify';
-
-import { deletePatient } from "../../redux/patients/patientRequests";
-import { AlertContext } from '../../contexts/AlertContext';
+import { deletePatient, updatePatient } from '../../redux/patients/patientRequests';
 
 // ----------------------------------------------------------------------
 
-
 export function PatientTableRow({ row, selected, onSelectRow }) {
-  const { showAlert } = useContext(AlertContext);
   const [openPopover, setOpenPopover] = useState(null);
   const dispatch = useDispatch();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedRow, setEditedRow] = useState({ ...row });
 
   const handleOpenPopover = useCallback((event) => {
     setOpenPopover(event.currentTarget);
@@ -36,12 +40,75 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
   const handleDelete = async (id) => {
     try {
       await dispatch(deletePatient(id));
-      showAlert('success', 'Patient deleted successfully!');
+      toast.success('Patient deleted successfully', {
+        position: 'top-center',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
     } catch (error) {
-      console.log("err")
-      showAlert('error', 'Failed to delete patient');
+      toast.error('Delete failed!', {
+        position: 'top-center',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
     }
-  }
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    handleClosePopover();
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditedRow((prev) => ({
+      ...prev,
+      [name]: name === 'contact_number' ? value.replace(/\D/g, '') : value, // Ensure contact number is numeric
+    }));
+  };
+
+  const handleSave = async () => {
+    const updatedPatient = {
+      ...editedRow,
+      date_of_birth: editedRow.date_of_birth?.substring(0, 10) || null,
+    };
+
+    const result = await dispatch(updatePatient(updatedPatient));
+
+    if (result.meta.requestStatus === 'fulfilled') {
+      toast.success('Patient updated successfully', {
+        position: 'top-center',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+    } else {
+      toast.error('Update failed!', {
+        position: 'top-center',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+    }
+  };
 
   return (
     <>
@@ -52,30 +119,107 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
 
         <TableCell component="th" scope="row">
           <Box gap={2} display="flex" alignItems="center">
-            {`${row.first_name} ${row.last_name}`} 
+            {isEditing ? (
+              <>
+                <TextField
+                  size="small"
+                  name="first_name"
+                  value={editedRow.first_name || ''}
+                  onChange={handleChange}
+                  placeholder="First Name"
+                />
+                <TextField
+                  size="small"
+                  name="last_name"
+                  value={editedRow.last_name || ''}
+                  onChange={handleChange}
+                  placeholder="Last Name"
+                />
+              </>
+            ) : (
+              `${row.first_name} ${row.last_name}`
+            )}
           </Box>
         </TableCell>
 
-        <TableCell> {row.date_of_birth ? new Date(row.date_of_birth).toISOString().substring(0, 10) : 'N/A'} </TableCell>
+        <TableCell>
+          {isEditing ? (
+            <TextField
+              size="small"
+              type="date"
+              name="date_of_birth"
+              value={editedRow.date_of_birth ? editedRow.date_of_birth.substring(0, 10) : ''}
+              onChange={handleChange}
+            />
+          ) : row.date_of_birth ? (
+            new Date(row.date_of_birth).toISOString().substring(0, 10)
+          ) : (
+            'N/A'
+          )}
+        </TableCell>
 
-        <TableCell><p className='gender'>{row.gender}</p></TableCell>
+        <TableCell>
+          {isEditing ? (
+            <TextField
+              size="small"
+              name="gender"
+              value={editedRow.gender || ''}
+              onChange={handleChange}
+            />
+          ) : (
+            <p className="gender">{row.gender}</p>
+          )}
+        </TableCell>
 
         <TableCell align="center">
-          {row.contact_number}
+          {isEditing ? (
+            <TextField
+              size="small"
+              name="contact_number"
+              value={editedRow.contact_number || ''}
+              onChange={handleChange}
+            />
+          ) : (
+            row.contact_number
+          )}
         </TableCell>
 
         <TableCell>
-          {row.address}
+          {isEditing ? (
+            <TextField
+              size="small"
+              name="address"
+              value={editedRow.address || ''}
+              onChange={handleChange}
+            />
+          ) : (
+            row.address
+          )}
         </TableCell>
 
         <TableCell>
-          {row.email}
+          {isEditing ? (
+            <TextField
+              size="small"
+              name="email"
+              value={editedRow.email || ''}
+              onChange={handleChange}
+            />
+          ) : (
+            row.email
+          )}
         </TableCell>
 
         <TableCell align="right">
-          <IconButton onClick={handleOpenPopover}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
+          {isEditing ? (
+            <Button variant="contained" size="small" onClick={handleSave}>
+              Save
+            </Button>
+          ) : (
+            <IconButton onClick={handleOpenPopover}>
+              <Iconify icon="eva:more-vertical-fill" />
+            </IconButton>
+          )}
         </TableCell>
       </TableRow>
 
@@ -102,7 +246,7 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
             },
           }}
         >
-          <MenuItem onClick={handleClosePopover}>
+          <MenuItem onClick={handleEdit}>
             <Iconify icon="solar:pen-bold" />
             Edit
           </MenuItem>
@@ -117,18 +261,17 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
   );
 }
 
-
-PatientTableRow.propTypes = { 
-  row: PropTypes.shape({ 
+PatientTableRow.propTypes = {
+  row: PropTypes.shape({
     patient_id: PropTypes.number.isRequired,
-    first_name: PropTypes.string.isRequired, 
-    last_name: PropTypes.string.isRequired, 
-    avatarUrl: PropTypes.string.isRequired, 
-    date_of_birth: PropTypes.string.isRequired, 
-    gender: PropTypes.string.isRequired, 
-    contact_number: PropTypes.string.isRequired, 
-    address: PropTypes.string.isRequired, 
-    email: PropTypes.string.isRequired, }).isRequired, 
-    selected: PropTypes.bool.isRequired, 
-    onSelectRow: PropTypes.func.isRequired,
-}
+    first_name: PropTypes.string.isRequired,
+    last_name: PropTypes.string.isRequired,
+    date_of_birth: PropTypes.string.isRequired,
+    gender: PropTypes.string.isRequired,
+    contact_number: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+  }).isRequired,
+  selected: PropTypes.bool.isRequired,
+  onSelectRow: PropTypes.func.isRequired,
+};
