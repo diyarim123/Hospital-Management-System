@@ -3,10 +3,10 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 // URL
-const URL = 'http://127.0.0.1:4000/patients';
+const URL = 'http://127.0.0.1:4000/appointments';
 
-export const getPatients = createAsyncThunk(
-  'patients/fetch',
+export const getAppointments = createAsyncThunk(
+  'appointments/fetch',
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
@@ -24,8 +24,8 @@ export const getPatients = createAsyncThunk(
   }
 );
 
-export const postPatient = createAsyncThunk(
-  'patients/post',
+export const postAppointment = createAsyncThunk(
+  'appointments/post',
   async (data, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
@@ -39,33 +39,33 @@ export const postPatient = createAsyncThunk(
 
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data || 'Error posting patient');
+      return rejectWithValue(err.response?.data || 'Error posting appointment');
     }
   }
 );
 
-export const updatePatient = createAsyncThunk(
-  'patients/update',
-  async (data, { rejectWithValue, getState }) => {
-    try {
-      const token = getState().auth.token; // Get token from Redux store
-
-      const response = await axios.patch(`${URL}/${data.patient_id}`, data, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // Attach token
-        },
-      });
-
-      return response.data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data || 'Error updating patient');
+export const updateAppointment = createAsyncThunk(
+    'appointments/update',
+    async (data, { rejectWithValue, getState }) => {
+      try {
+        const token = getState().auth.token; // Get token from Redux store
+  
+        const response = await axios.patch(`${URL}/${data.appointment_id}`, data, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // Attach token
+          },
+        });
+  
+        return response.data;
+      } catch (err) {
+        return rejectWithValue(err.response?.data || 'Error updating appointment');
+      }
     }
-  }
-);
+  );
 
-export const deletePatient = createAsyncThunk(
-  'patients/delete',
+export const deleteAppointment = createAsyncThunk(
+  'appointments/delete',
   async (id, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
@@ -78,9 +78,8 @@ export const deletePatient = createAsyncThunk(
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete patient');
+        throw new Error('Failed to delete appointment');
       }
-
 
       return id;
     } catch (error) {

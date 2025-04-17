@@ -3,10 +3,10 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 // URL
-const URL = 'http://127.0.0.1:4000/patients';
+const URL = 'http://127.0.0.1:4000/billings';
 
-export const getPatients = createAsyncThunk(
-  'patients/fetch',
+export const getBillings = createAsyncThunk(
+  'billings/fetch',
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
@@ -24,8 +24,8 @@ export const getPatients = createAsyncThunk(
   }
 );
 
-export const postPatient = createAsyncThunk(
-  'patients/post',
+export const postBilling = createAsyncThunk(
+  'billings/post',
   async (data, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
@@ -39,18 +39,18 @@ export const postPatient = createAsyncThunk(
 
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data || 'Error posting patient');
+      return rejectWithValue(err.response?.data || 'Error posting bill');
     }
   }
 );
 
-export const updatePatient = createAsyncThunk(
-  'patients/update',
+export const updateBilling = createAsyncThunk(
+  'billings/update',
   async (data, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
 
-      const response = await axios.patch(`${URL}/${data.patient_id}`, data, {
+      const response = await axios.patch(`${URL}/${data.bill_id}`, data, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`, // Attach token
@@ -59,13 +59,13 @@ export const updatePatient = createAsyncThunk(
 
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data || 'Error updating patient');
+      return rejectWithValue(err.response?.data || 'Error updating bill');
     }
   }
 );
 
-export const deletePatient = createAsyncThunk(
-  'patients/delete',
+export const deleteBilling = createAsyncThunk(
+  'billings/delete',
   async (id, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
@@ -78,7 +78,7 @@ export const deletePatient = createAsyncThunk(
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete patient');
+        throw new Error('Failed to delete billing');
       }
 
 

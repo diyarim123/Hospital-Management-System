@@ -38,7 +38,6 @@ export function useTable() {
       const isAsc = orderBy === columnId && order === 'asc';
       setOrder(isAsc ? 'desc' : 'asc');
       setOrderBy(columnId);
-      console.log('orderBy:', orderBy, 'order:', order);
     },
     [order, orderBy]
   );
@@ -121,8 +120,6 @@ export function PatientsView({ handleModal }) {
   const handleRetry = () => {
     dispatch(getPatients());
   };
-  console.log("current patient_data data", patients_data)
-  console.log("filtered data", dataFiltered)
 
   return (
     <DashboardContent>

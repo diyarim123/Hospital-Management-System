@@ -2,7 +2,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 // import the fetch function
-import { getDoctors, postDoctor, deleteDoctor } from './doctorsRequests';
+import { getDoctors, postDoctor, updateDoctor ,deleteDoctor } from './doctorsRequests';
 
 const initialState = {
   doctors_loading: false,
@@ -44,20 +44,20 @@ const DoctorssSlice = createSlice({
     });
 
     // Update Doctor
-    // builder.addCase(updateDoctor.pending, (state) => {
-    //   state.doctors_loading = true;
-    //   state.doctors_err = '';
-    // });
-    // builder.addCase(updateDoctor.fulfilled, (state, action) => {
-    //   state.doctors_loading = false;
-    //   state.doctors_data = state.doctors_data.map((doctor) =>
-    //     doctor.doctor_id === action.payload.data.doctor_id ? action.payload.data : doctor
-    //   );
-    // });
-    // builder.addCase(updateDoctor.rejected, (state, action) => {
-    //   state.doctors_loading = false;
-    //   state.doctors_err = action.payload.error;
-    // });
+    builder.addCase(updateDoctor.pending, (state) => {
+      state.doctors_loading = true;
+      state.doctors_err = '';
+    });
+    builder.addCase(updateDoctor.fulfilled, (state, action) => {
+      state.doctors_loading = false;
+      state.doctors_data = state.doctors_data.map((doctor) =>
+        doctor.doctor_id === action.payload.data.doctor_id ? action.payload.data : doctor
+      );
+    });
+    builder.addCase(updateDoctor.rejected, (state, action) => {
+      state.doctors_loading = false;
+      state.doctors_err = action.payload.error;
+    });
 
     // Delete Doctor
     builder.addCase(deleteDoctor.pending, (state) => {

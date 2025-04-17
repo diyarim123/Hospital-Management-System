@@ -1,5 +1,5 @@
 // importing redux
-import { createSlice, current } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 // import the fetch function
 import { getPatients, postPatient, updatePatient, deletePatient } from './patientRequests';
@@ -37,7 +37,7 @@ const PatientsSlice = createSlice({
     });
     builder.addCase(postPatient.fulfilled, (state, action) => {
       state.patients_loading = false;
-      state.patients_data = [...state.patients_data, action.payload];
+      state.patients_data = [...state.patients_data, action.payload.data];
     });
     builder.addCase(postPatient.rejected, (state, action) => {
       state.patients_loading = false;

@@ -39,13 +39,33 @@ export const postDoctor = createAsyncThunk(
 
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data || 'Error posting patient');
+      return rejectWithValue(err.response?.data || 'Error posting doctor');
+    }
+  }
+);
+
+export const updateDoctor = createAsyncThunk(
+  'doctors/update',
+  async (data, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.token; // Get token from Redux store
+
+      const response = await axios.patch(`${URL}/${data.doctor_id}`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Attach token
+        },
+      });
+
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || 'Error updating doctor');
     }
   }
 );
 
 export const deleteDoctor = createAsyncThunk(
-  'doctors/deleteDoctor',
+  'doctors/delete',
   async (id, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
@@ -58,7 +78,7 @@ export const deleteDoctor = createAsyncThunk(
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete patient');
+        throw new Error('Failed to delete doctor');
       }
 
       return id;
