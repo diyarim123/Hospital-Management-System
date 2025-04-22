@@ -1,5 +1,9 @@
 import PropTypes from 'prop-types';
-import { useState, useCallback, useContext } from 'react';
+import { useState, useCallback } from 'react';
+
+// Toast notifications
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { useDispatch } from 'react-redux';
 
@@ -15,13 +19,11 @@ import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 import { Iconify } from '../../components/iconify';
 
 import { deleteDoctor } from "../../redux/doctors/doctorsRequests";
-import { AlertContext } from '../../contexts/AlertContext';
 
 // ----------------------------------------------------------------------
 
 
 export function DoctorTableRow({ row, selected, onSelectRow }) {
-  const { showAlert } = useContext(AlertContext);
   const [openPopover, setOpenPopover] = useState(null);
   const dispatch = useDispatch();
 
@@ -36,10 +38,27 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
   const handleDelete = async (id) => {
     try {
       await dispatch(deleteDoctor(id));
-      showAlert('success', 'Doctor deleted successfully!');
+      toast.success('Patient deleted successfully', {
+        position: 'top-center',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
     } catch (error) {
-      console.log("err")
-      showAlert('error', 'Failed to delete doctor');
+      toast.error('Delete failed!', {
+        position: 'top-center',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
     }
   }
 
