@@ -24,6 +24,9 @@ import { PatientTableToolbar } from '../patients-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 import { getPatients } from '../../../redux/patients/patientRequests'; // Import the getPatients action
 
+// js pdf imports
+import { exportPatientsToPDF } from '../../../utils/pdfExport';
+
 // ----------------------------------------------------------------------
 
 export function useTable() {
@@ -105,12 +108,13 @@ export function PatientsView({ handleModal }) {
     dispatch(getPatients());
   }, [dispatch]);
 
-  const dataFiltered = useMemo(() => 
-    applyFilter({
-      inputData: patients_data || [],
-      comparator: getComparator(table.order, table.orderBy),
-      filterName,
-    }), 
+  const dataFiltered = useMemo(
+    () =>
+      applyFilter({
+        inputData: patients_data || [],
+        comparator: getComparator(table.order, table.orderBy),
+        filterName,
+      }),
     [patients_data, table, filterName]
   );
 
@@ -119,6 +123,10 @@ export function PatientsView({ handleModal }) {
 
   const handleRetry = () => {
     dispatch(getPatients());
+  };
+
+  const handleExportPDF = () => {
+    exportPatientsToPDF(dataFiltered);
   };
 
   return (
@@ -179,10 +187,7 @@ export function PatientsView({ handleModal }) {
                     numSelected={table.selected.length}
                     onSort={table.onSort}
                     onSelectAllRows={(checked) =>
-                      table.onSelectAllRows(
-                        checked,
-                        patients_data?.map((user) => user.id) || []
-                      )
+                      table.onSelectAllRows(checked, patients_data?.map((user) => user.id) || [])
                     }
                     headLabel={[
                       { id: 'first_name', label: 'Name' },
@@ -239,6 +244,20 @@ export function PatientsView({ handleModal }) {
           </Card>
         </>
       )}
+      <Button
+        variant="outlined"
+        color="primary"
+        startIcon={<Iconify icon="mdi:file-pdf-box" />}
+        onClick={handleExportPDF}
+        sx={{
+          ml: 2, // margin-left
+          mt: 3, // margin-top to separate from the table
+          width: '180px', // custom width
+          alignSelf: 'flex-end', // push to right side if inside a flex container
+        }}
+      >
+        Export PDF
+      </Button>
     </DashboardContent>
   );
 }

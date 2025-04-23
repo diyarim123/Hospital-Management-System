@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo} from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
@@ -23,6 +23,9 @@ import { TableEmptyRows } from '../table-empty-rows';
 import { DoctorTableToolbar } from '../doctors-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 import { getDoctors } from '../../../redux/doctors/doctorsRequests'; // Import the getDoctors action
+
+// js pdf imports
+import { exportPatientsToPDF } from '../../../utils/pdfExport';
 
 // ----------------------------------------------------------------------
 
@@ -106,12 +109,13 @@ export function DoctorsView({ handleModal }) {
     dispatch(getDoctors());
   }, [dispatch]);
 
-  const dataFiltered = useMemo(() => 
-    applyFilter({
-      inputData: doctors_data || [],
-      comparator: getComparator(table.order, table.orderBy),
-      filterName,
-    }), 
+  const dataFiltered = useMemo(
+    () =>
+      applyFilter({
+        inputData: doctors_data || [],
+        comparator: getComparator(table.order, table.orderBy),
+        filterName,
+      }),
     [doctors_data, table, filterName]
   );
 
@@ -120,6 +124,10 @@ export function DoctorsView({ handleModal }) {
 
   const handleRetry = () => {
     dispatch(getDoctors());
+  };
+
+  const handleExportPDF = () => {
+    exportPatientsToPDF(dataFiltered);
   };
 
   return (
@@ -190,7 +198,7 @@ export function DoctorsView({ handleModal }) {
                       { id: 'specialization', label: 'Specialization' },
                       { id: 'gender', label: 'Gender' },
                       { id: 'contact_number', label: 'Phone Number', align: 'center' },
-                      { id: 'department_name', label: 'Department' }
+                      { id: 'department_name', label: 'Department' },
                     ]}
                   />
                   <TableBody>
@@ -239,6 +247,20 @@ export function DoctorsView({ handleModal }) {
           </Card>
         </>
       )}
+      <Button
+        variant="outlined"
+        color="primary"
+        startIcon={<Iconify icon="mdi:file-pdf-box" />}
+        onClick={handleExportPDF}
+        sx={{
+          ml: 2, // margin-left
+          mt: 3, // margin-top to separate from the table
+          width: '180px', // custom width
+          alignSelf: 'flex-end', // push to right side if inside a flex container
+        }}
+      >
+        Export PDF
+      </Button>
     </DashboardContent>
   );
 }
