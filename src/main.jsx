@@ -28,13 +28,13 @@ const store = configureStore({
     doctors: DoctorsSlice,
     auth: AuthSlice,
     appointments: AppointmentsSlice,
-    departments: DepartmentsSlice,
     medicals: MedicalSlice,
     staff: StaffSlice,
     billings: BillingsSlice,
     rooms: RoomsSlice,
     assignments: AssignmentsSlice,
     services: ServicesSlice,
+    departments: DepartmentsSlice,
   },
 });
 

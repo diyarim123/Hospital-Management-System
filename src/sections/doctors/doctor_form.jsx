@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 // Toast notifications
@@ -6,23 +6,31 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { TextField, Button, Autocomplete } from '@mui/material';
-import { useDispatch } from 'react-redux';
-import { postDoctor } from "../../redux/doctors/doctorsRequests";
+import { useSelector, useDispatch } from 'react-redux';
+import { getDepartments } from '../../redux/departments/departmentRequests';
+import { postDoctor } from '../../redux/doctors/doctorsRequests';
 
 const GenderOptions = ['Male', 'Female'];
 
-const DoctorForm = ({isOpen, handleModal}) => {
+const DoctorForm = ({ isOpen, handleModal }) => {
   const dispatch = useDispatch();
   const [showWarning, setShowWarning] = useState(false);
+  const { departments_loading, departments_data, departments_err } = useSelector(
+    (state) => state.departments
+  );
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
-    date_of_birth: '',
-    gender: '',
+    specialization: '',
+    gender: null,
     contact_number: '',
-    address: '',
-    email: ''
+    department_id: null,
+    department_name: '',
   });
+
+  useEffect(() => {
+    dispatch(getDepartments());
+  }, [dispatch]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -54,54 +62,62 @@ const DoctorForm = ({isOpen, handleModal}) => {
         progress: undefined,
         theme: 'light',
       });
-      handleModal(false)
+      handleModal(false);
+    } else {
+        toast.error('Failed to add a doctor', {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      
     }
   };
 
-  const isFormEmpty = Object.values(formData).every(value => value === '');
+  const isFormEmpty = Object.values(formData).every((value) => value === '');
 
   return (
     <form onSubmit={handleSubmit}>
-      <TextField 
-        label="First Name" 
-        variant="outlined" 
-        name="first_name" 
-        value={formData.first_name} 
-        onChange={handleChange} 
-        fullWidth 
+      <TextField
+        label="First Name"
+        variant="outlined"
+        name="first_name"
+        value={formData.first_name}
+        onChange={handleChange}
+        fullWidth
         sx={{ mb: 2 }}
         error={showWarning && formData.first_name === ''}
         helperText={showWarning && formData.first_name === '' ? 'This field is required' : ''}
         required
       />
       <br />
-      <TextField 
-        label="Last Name" 
-        variant="outlined" 
-        name="last_name" 
-        value={formData.last_name} 
-        onChange={handleChange} 
-        fullWidth 
+      <TextField
+        label="Last Name"
+        variant="outlined"
+        name="last_name"
+        value={formData.last_name}
+        onChange={handleChange}
+        fullWidth
         sx={{ mb: 2 }}
         error={showWarning && formData.last_name === ''}
         helperText={showWarning && formData.last_name === '' ? 'This field is required' : ''}
         required
       />
       <br />
-      <TextField 
-        label="Date of Birth" 
-        variant="outlined" 
-        type="date" 
-        name="date_of_birth" 
-        value={formData.date_of_birth} 
-        onChange={handleChange} 
-        fullWidth 
-        InputLabelProps={{
-          shrink: true
-        }}
+      <TextField
+        label="Specialization"
+        variant="outlined"
+        name="specialization"
+        value={formData.specialization}
+        onChange={handleChange}
+        fullWidth
         sx={{ mb: 2 }}
-        error={showWarning && formData.date_of_birth === ''}
-        helperText={showWarning && formData.date_of_birth === '' ? 'This field is required' : ''}
+        error={showWarning && formData.specialization === ''}
+        helperText={showWarning && formData.specialization === '' ? 'This field is required' : ''}
         required
       />
       <br />
@@ -117,9 +133,9 @@ const DoctorForm = ({isOpen, handleModal}) => {
           })
         }
         renderInput={(params) => (
-          <TextField 
-            {...params} 
-            label="Gender" 
+          <TextField
+            {...params}
+            label="Gender"
             error={showWarning && formData.gender === ''}
             helperText={showWarning && formData.gender === '' ? 'This field is required' : ''}
             required
@@ -129,47 +145,48 @@ const DoctorForm = ({isOpen, handleModal}) => {
       <br />
       <TextField
         label="Phone Number"
-        variant="outlined" 
-        name="contact_number" 
-        value={formData.contact_number} 
+        variant="outlined"
+        name="contact_number"
+        value={formData.contact_number}
         onChange={handleChange}
-        fullWidth 
+        fullWidth
         error={showWarning && formData.contact_number === ''}
         helperText={showWarning && formData.contact_number === '' ? 'This field is required' : ''}
         required
       />
-      <p className='mx-2 mt-1 font-light text-gray-400'> For ex {`'+9647xxxxxxxxx'`}</p>
+      <p className="mx-2 mt-1 font-light text-gray-400"> For ex {`'+9647xxxxxxxxx'`}</p>
       <br />
-      <TextField 
-        label="Address" 
-        variant="outlined" 
-        name="address" 
-        value={formData.address} 
-        onChange={handleChange} 
-        fullWidth 
-        error={showWarning && formData.address === ''}
-        helperText={showWarning && formData.address === '' ? 'This field is required' : ''}
-        required
+      <Autocomplete
+        disablePortal
+        options={departments_data || []}
+        getOptionLabel={(option) => option.department_name}
+        value={
+          (departments_data || []).find((dept) => dept.department_id === formData.department_id) ||
+          null
+        }
+        onChange={(event, newValue) => {
+          setFormData({
+            ...formData,
+            department_id: newValue ? newValue.department_id : null,
+            department_name: newValue ? newValue.department_name : '',
+          });
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Department"
+            error={showWarning && !formData.department_id}
+            helperText={showWarning && !formData.department_id ? 'This field is required' : ''}
+            required
+          />
+        )}
+        sx={{ mb: 2 }}
       />
-      <p className='mx-2 mt-1 font-light text-gray-400'> For ex {`'123 Rasty St, Erbil'`}</p>
       <br />
-      <TextField 
-        label="Email" 
-        variant="outlined" 
-        name="email" 
-        value={formData.email} 
-        onChange={handleChange} 
-        fullWidth 
-        error={showWarning && formData.email === ''}
-        helperText={showWarning && formData.email === '' ? 'This field is required' : ''}
-        required
-      />
-      <p className='mx-2 mt-1 font-light text-gray-400'> For ex {`'john.doe@gmail.com'`}</p>
-      <br />
-      <Button 
-        variant="contained" 
-        type="submit" 
-        color="primary" 
+      <Button
+        variant="contained"
+        type="submit"
+        color="primary"
         disabled={isFormEmpty}
         sx={{ float: 'right' }} // Float the button to the right
       >
@@ -183,5 +200,5 @@ export default DoctorForm;
 
 DoctorForm.propTypes = {
   isOpen: PropTypes.bool,
-  handleModal: PropTypes.func
-}
+  handleModal: PropTypes.func,
+};

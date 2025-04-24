@@ -39,3 +39,38 @@ export const exportPatientsToPDF = (dataFiltered) => {
 
   doc.save('patients.pdf');
 };
+
+export const exportDoctorsToPDF = (dataFiltered) => {
+  const doc = new JsPDF(); 
+
+  doc.text('Doctors List', 14, 16);
+
+  const tableColumn = [
+    'First Name',
+    'Last Name',
+    'Specialization',
+    'Gender',
+    'Phone',
+    'Department',
+  ];
+
+  const tableRows = dataFiltered.map((doctor) => [
+    doctor.first_name,
+    doctor.last_name,
+    doctor.specialization,
+    doctor.gender,
+    doctor.contact_number,
+    doctor.department_name
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 22,
+    theme: 'grid',
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+  });
+
+  doc.save('doctors.pdf');
+};

@@ -14,7 +14,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Iconify } from '../../../components/iconify';
 import { Scrollbar } from '../../../components/scrollbar';
 import { DashboardContent } from '../../../layouts/dashboard';
-import ModalUnstyled from '../doctors-modal';
+import ModalUnstyled from '../doctors_modal';
 
 import { TableNoData } from '../table-no-data';
 import { DoctorTableRow } from '../doctors-table-row';
@@ -22,10 +22,10 @@ import { DoctorTableHead } from '../doctors-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { DoctorTableToolbar } from '../doctors-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
-import { getDoctors } from '../../../redux/doctors/doctorsRequests'; // Import the getDoctors action
+import { getDoctors } from '../../../redux/doctors/doctorsRequests';
 
 // js pdf imports
-import { exportPatientsToPDF } from '../../../utils/pdfExport';
+import { exportDoctorsToPDF } from '../../../utils/pdfExport';
 
 // ----------------------------------------------------------------------
 
@@ -41,7 +41,6 @@ export function useTable() {
       const isAsc = orderBy === columnId && order === 'asc';
       setOrder(isAsc ? 'desc' : 'asc');
       setOrderBy(columnId);
-      console.log('orderBy:', orderBy, 'order:', order);
     },
     [order, orderBy]
   );
@@ -105,6 +104,8 @@ export function DoctorsView({ handleModal }) {
   const { doctors_loading, doctors_data, doctors_err } = useSelector((state) => state.doctors);
   const dispatch = useDispatch();
 
+
+
   useEffect(() => {
     dispatch(getDoctors());
   }, [dispatch]);
@@ -127,7 +128,7 @@ export function DoctorsView({ handleModal }) {
   };
 
   const handleExportPDF = () => {
-    exportPatientsToPDF(dataFiltered);
+    exportDoctorsToPDF(dataFiltered);
   };
 
   return (
@@ -184,18 +185,15 @@ export function DoctorsView({ handleModal }) {
                   <DoctorTableHead
                     order={table.order}
                     orderBy={table.orderBy}
-                    rowCount={doctors_data?.result?.length || 0}
+                    rowCount={doctors_data?.length || 0}
                     numSelected={table.selected.length}
                     onSort={table.onSort}
                     onSelectAllRows={(checked) =>
-                      table.onSelectAllRows(
-                        checked,
-                        doctors_data?.result?.map((user) => user.id) || []
-                      )
+                      table.onSelectAllRows(checked, doctors_data?.map((user) => user.id) || [])
                     }
                     headLabel={[
                       { id: 'first_name', label: 'Name' },
-                      { id: 'specialization', label: 'Specialization' },
+                      {id: 'specialization', label: 'Specialization'},
                       { id: 'gender', label: 'Gender' },
                       { id: 'contact_number', label: 'Phone Number', align: 'center' },
                       { id: 'department_name', label: 'Department' },
@@ -225,7 +223,7 @@ export function DoctorsView({ handleModal }) {
                       emptyRows={emptyRows(
                         table.page,
                         table.rowsPerPage,
-                        doctors_data?.result?.length || 0
+                        doctors_data?.length || 0
                       )}
                     />
 
@@ -238,7 +236,7 @@ export function DoctorsView({ handleModal }) {
             <TablePagination
               component="div"
               page={table.page}
-              count={doctors_data?.result?.length || 0}
+              count={doctors_data?.length || 0}
               rowsPerPage={table.rowsPerPage}
               onPageChange={table.onChangePage}
               rowsPerPageOptions={[5, 10, 25]}

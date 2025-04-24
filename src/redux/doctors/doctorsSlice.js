@@ -21,7 +21,7 @@ const DoctorssSlice = createSlice({
     });
     builder.addCase(getDoctors.fulfilled, (state, action) => {
       state.doctors_loading = false;
-      state.doctors_data = action.payload;
+      state.doctors_data = action.payload.result;
       state.doctors_err = '';
     });
     builder.addCase(getDoctors.rejected, (state, action) => {
@@ -36,7 +36,7 @@ const DoctorssSlice = createSlice({
     });
     builder.addCase(postDoctor.fulfilled, (state, action) => {
       state.doctors_loading = false;
-      state.doctors_data = [...state.doctors_data, action.payload];
+      state.doctors_data = [...state.doctors_data, action.payload.data];
     });
     builder.addCase(postDoctor.rejected, (state, action) => {
       state.doctors_loading = false;
@@ -66,7 +66,8 @@ const DoctorssSlice = createSlice({
     });
     builder.addCase(deleteDoctor.fulfilled, (state, action) => {
       state.doctors_loading = false;
-      state.doctors_data = state.doctors_data.filter((doctor) => doctor.id !== action.payload);
+      state.doctors_data = state.doctors_data.filter((doctor) => doctor.doctor_id !== action.payload);
+      console.log("doctors data after deleting", state.doctors_data)
     });
     builder.addCase(deleteDoctor.rejected, (state, action) => {
       state.doctors_loading = false;

@@ -15,7 +15,6 @@ import PublicRoute from "./PublicRoute";
 // ----------------------------------------------------------------------
 
 export const HomePage = lazy(() => import("../pages/home"));
-export const BlogPage = lazy(() => import("../pages/blog"));
 export const PatientPage = lazy(() => import("../pages/patients"));
 export const SignInPage = lazy(() => import("../pages/sign-in"));
 export const SignUpPage = lazy(() => import("../pages/sign-up"));
@@ -78,7 +77,6 @@ export function Router() {
             { element: <HomePage />, index: true },
             { path: "patients", element: <PatientPage /> },
             { path: "doctors", element: <DoctorsPage /> },
-            { path: "blog", element: <BlogPage /> },
           ],
         },
       ],

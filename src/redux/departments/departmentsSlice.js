@@ -76,4 +76,4 @@ const DepartmentsSlice = createSlice({
   },
 });
 
-export default DepartmentsSlice
+export default DepartmentsSlice.reducer;
