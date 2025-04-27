@@ -26,8 +26,7 @@ const StaffSlice = createSlice({
     });
     builder.addCase(getStaff.rejected, (state, action) => {
       state.staff_loading = false;
-      state.staff_err =
-        action.payload.error || 'The server is unreachable, Please check your API.';
+      state.staff_err = action.payload.error || 'The server is unreachable, Please check your API.';
     });
 
     // Post Staff

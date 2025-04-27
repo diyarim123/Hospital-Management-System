@@ -39,7 +39,7 @@ export const postService = createAsyncThunk(
 
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data || 'Error posting service');
+      return rejectWithValue(err.response?.error || 'Error posting service');
     }
   }
 );
@@ -59,7 +59,7 @@ export const updateService = createAsyncThunk(
 
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data || 'Error updating service');
+      return rejectWithValue(err.response?.error || 'Error updating service');
     }
   }
 );

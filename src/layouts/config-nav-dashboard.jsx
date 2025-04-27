@@ -17,16 +17,21 @@ export const navData = [
     title: 'Patients',
     path: '/patients',
     icon: icon('patient'),
-    info: (
-      <Label color="error" variant="inverted">
-        +3
-      </Label>
-    ),
   },
   {
     title: 'Doctors',
     path: '/doctors',
     icon: icon('doctor'),
+  },
+  {
+    title: 'Staff',
+    path: '/staff',
+    icon: icon('staff'),
+  },
+  {
+    title: 'Services',
+    path: '/services',
+    icon: icon('services'),
   },
   {
     title: 'Appointments',

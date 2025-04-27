@@ -8,11 +8,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import { TextField, Button, Autocomplete } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { getDepartments } from '../../redux/departments/departmentRequests';
-import { postDoctor } from '../../redux/doctors/doctorsRequests';
+import { postStaff } from '../../redux/staff/staffRequests';
 
 const GenderOptions = ['Male', 'Female'];
+const RoleOptions = ['Nurse', 'Receptionist', 'Technician', 'Admin', 'Support'];
 
-const DoctorForm = ({ isOpen, handleModal }) => {
+const StaffForm = ({ isOpen, handleModal }) => {
   const dispatch = useDispatch();
   const [showWarning, setShowWarning] = useState(false);
   const { departments_loading, departments_data, departments_err } = useSelector(
@@ -21,12 +22,15 @@ const DoctorForm = ({ isOpen, handleModal }) => {
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
-    specialization: '',
+    role: null,
     gender: null,
     contact_number: '',
     department_id: null,
     department_name: '',
   });
+;
+  console.log('formData before submitting:', formData);
+
 
   useEffect(() => {
     dispatch(getDepartments());
@@ -49,12 +53,10 @@ const DoctorForm = ({ isOpen, handleModal }) => {
       return;
     }
 
-    console.log("form data after submitting", formData)
-
-    const result = await dispatch(postDoctor(formData));
+    const result = await dispatch(postStaff(formData));
 
     if (result.meta.requestStatus === 'fulfilled') {
-      toast.success('Doctor added successfully', {
+      toast.success('Staff added successfully', {
         position: 'top-center',
         autoClose: 2000,
         hideProgressBar: false,
@@ -66,17 +68,16 @@ const DoctorForm = ({ isOpen, handleModal }) => {
       });
       handleModal(false);
     } else {
-        toast.error('Failed to add a doctor', {
-        position: "top-center",
+      toast.error('Failed to add a staff', {
+        position: 'top-center',
         autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: false,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "light",
+        theme: 'light',
       });
-      
     }
   };
 
@@ -110,19 +111,6 @@ const DoctorForm = ({ isOpen, handleModal }) => {
         required
       />
       <br />
-      <TextField
-        label="Specialization"
-        variant="outlined"
-        name="specialization"
-        value={formData.specialization}
-        onChange={handleChange}
-        fullWidth
-        sx={{ mb: 2 }}
-        error={showWarning && formData.specialization === ''}
-        helperText={showWarning && formData.specialization === '' ? 'This field is required' : ''}
-        required
-      />
-      <br />
       <Autocomplete
         disablePortal
         options={GenderOptions}
@@ -145,6 +133,28 @@ const DoctorForm = ({ isOpen, handleModal }) => {
         )}
       />
       <br />
+      <Autocomplete
+        disablePortal
+        options={RoleOptions}
+        name="role"
+        value={formData.role}
+        onChange={(event, newValue) =>
+          setFormData({
+            ...formData,
+            role: newValue || '',
+          })
+        }
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Role"
+            error={showWarning && formData.role === ''}
+            helperText={showWarning && formData.role === '' ? 'This field is required' : ''}
+            required
+          />
+        )}
+      />
+      <br />
       <TextField
         label="Phone Number"
         variant="outlined"
@@ -161,7 +171,7 @@ const DoctorForm = ({ isOpen, handleModal }) => {
       <Autocomplete
         disablePortal
         options={departments_data || []}
-        getOptionLabel={(option) => option.department_name}
+        getOptionLabel={(option) => option.department_name || ''} // Ensure it returns a string
         value={
           (departments_data || []).find((dept) => dept.department_id === formData.department_id) ||
           null
@@ -184,6 +194,7 @@ const DoctorForm = ({ isOpen, handleModal }) => {
         )}
         sx={{ mb: 2 }}
       />
+
       <br />
       <Button
         variant="contained"
@@ -198,9 +209,9 @@ const DoctorForm = ({ isOpen, handleModal }) => {
   );
 };
 
-export default DoctorForm;
+export default StaffForm;
 
-DoctorForm.propTypes = {
+StaffForm.propTypes = {
   isOpen: PropTypes.bool,
   handleModal: PropTypes.func,
 };

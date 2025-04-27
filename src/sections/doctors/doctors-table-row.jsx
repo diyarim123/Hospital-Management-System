@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 // Toast notifications
 import { toast } from 'react-toastify';
@@ -19,15 +19,21 @@ import Button from '@mui/material/Button';
 
 import { Iconify } from '../../components/iconify';
 import { deleteDoctor, updateDoctor } from '../../redux/doctors/doctorsRequests';
+import { getDepartments } from '../../redux/departments/departmentRequests';
 
 // ----------------------------------------------------------------------
 
 export function DoctorTableRow({ row, selected, onSelectRow }) {
   const [openPopover, setOpenPopover] = useState(null);
+  const [departmentsReady, setDepartmentsReady] = useState(false);
   const dispatch = useDispatch();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedRow, setEditedRow] = useState({ ...row });
+
+  const { departments_loading, departments_data, departments_err } = useSelector(
+    (state) => state.departments
+  );
 
   const handleOpenPopover = useCallback((event) => {
     setOpenPopover(event.currentTarget);
@@ -51,8 +57,8 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
         theme: 'light',
       });
     } catch (error) {
-      console.log("id", id)
-      console.log(error)
+      console.log('id', id);
+      console.log(error);
       toast.error('Delete failed!', {
         position: 'top-center',
         autoClose: 1500,
@@ -66,9 +72,23 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
     }
   };
 
-  const handleEdit = () => {
-    setIsEditing(true);
+  const handleEdit = async () => {
     handleClosePopover();
+    setDepartmentsReady(false); // Reset departmentsReady before fetching
+
+    const result = await dispatch(getDepartments());
+
+    if (result.meta.requestStatus === 'fulfilled') {
+      setDepartmentsReady(true); // Now departments are ready
+      setIsEditing(true);
+    } else {
+      toast.error('Failed to load departments', {
+        position: 'top-center',
+        autoClose: 1500,
+        hideProgressBar: false,
+        theme: 'light',
+      });
+    }
   };
 
   const handleChange = (e) => {
@@ -80,13 +100,20 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
   };
 
   const handleSave = async () => {
+    // Find the selected department name based on the new department_id
+    const selectedDepartment = departments_data.find(
+      (dept) => dept.department_id === editedRow.department_id
+    );
+  
     const updatedDoctor = {
-      ...editedRow
+      ...editedRow,
+      department_name: selectedDepartment ? selectedDepartment.department_name : row.department_name,
     };
-
+  
     const result = await dispatch(updateDoctor(updatedDoctor));
-
+  
     if (result.meta.requestStatus === 'fulfilled') {
+      setIsEditing(false); // Exit edit mode after successful save
       toast.success('Doctor updated successfully', {
         position: 'top-center',
         autoClose: 2000,
@@ -97,6 +124,9 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
         progress: undefined,
         theme: 'light',
       });
+  
+      // Also update editedRow to reflect the correct department name immediately
+      setEditedRow(updatedDoctor);
     } else {
       toast.error('Update failed!', {
         position: 'top-center',
@@ -110,6 +140,7 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
       });
     }
   };
+  
 
   return (
     <>
@@ -159,11 +190,15 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
         <TableCell>
           {isEditing ? (
             <TextField
+              select
               size="small"
               name="gender"
               value={editedRow.gender || ''}
               onChange={handleChange}
-            />
+            >
+              <MenuItem value="Male">Male</MenuItem>
+              <MenuItem value="Female">Female</MenuItem>
+            </TextField>
           ) : (
             <p className="gender">{row.gender}</p>
           )}
@@ -184,17 +219,27 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
 
         <TableCell>
           {isEditing ? (
-            <TextField
-              size="small"
-              name="department_name"
-              value={editedRow.department_name || ''}
-              onChange={handleChange}
-            />
+            departmentsReady ? (
+              <TextField
+                select
+                size="small"
+                name="department_id"
+                value={editedRow.department_id || ''}
+                onChange={handleChange}
+              >
+                {departments_data?.map((dept) => (
+                  <MenuItem key={dept.department_id} value={dept.department_id}>
+                    {dept.department_name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            ) : (
+              <TextField size="small" disabled value="Loading departments..." />
+            )
           ) : (
-            <p className="department_name">{row.department_name}</p>
+            <p className="department_name">{editedRow.department_name || row.department_name}</p>
           )}
         </TableCell>
-
 
         <TableCell align="right">
           {isEditing ? (
@@ -256,7 +301,7 @@ DoctorTableRow.propTypes = {
     gender: PropTypes.string.isRequired,
     contact_number: PropTypes.string.isRequired,
     department_id: PropTypes.number.isRequired,
-    department_name: PropTypes.string.isRequired
+    department_name: PropTypes.string.isRequired,
   }).isRequired,
   selected: PropTypes.bool.isRequired,
   onSelectRow: PropTypes.func.isRequired,

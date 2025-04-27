@@ -6,7 +6,6 @@ import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
@@ -18,11 +17,11 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
 import { Iconify } from '../../components/iconify';
-import { deletePatient, updatePatient } from '../../redux/patients/patientRequests';
+import { deleteService, updateService } from '../../redux/services/serviceRequests';
 
 // ----------------------------------------------------------------------
 
-export function PatientTableRow({ row, selected, onSelectRow }) {
+export function ServiceTableRow({ row, selected, onSelectRow }) {
   const [openPopover, setOpenPopover] = useState(null);
   const dispatch = useDispatch();
 
@@ -39,8 +38,8 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
 
   const handleDelete = async (id) => {
     try {
-      await dispatch(deletePatient(id));
-      toast.success('Patient deleted successfully', {
+      await dispatch(deleteService(id));
+      toast.success('Service deleted successfully', {
         position: 'top-center',
         autoClose: 2000,
         hideProgressBar: false,
@@ -73,20 +72,20 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
     const { name, value } = e.target;
     setEditedRow((prev) => ({
       ...prev,
-      [name]: name === 'contact_number' ? value.replace(/\D/g, '') : value, // Ensure contact number is numeric
+      [name]: value,
     }));
   };
+  
 
   const handleSave = async () => {
-    const updatedPatient = {
+    const updatedService = {
       ...editedRow,
-      date_of_birth: editedRow.date_of_birth?.substring(0, 10) || null,
     };
 
-    const result = await dispatch(updatePatient(updatedPatient));
+    const result = await dispatch(updateService(updatedService));
 
     if (result.meta.requestStatus === 'fulfilled') {
-      toast.success('Patient updated successfully', {
+      toast.success('Service updated successfully', {
         position: 'top-center',
         autoClose: 2000,
         hideProgressBar: false,
@@ -117,74 +116,16 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
           <Checkbox disableRipple checked={selected} onChange={onSelectRow} />
         </TableCell>
 
-        <TableCell component="th" scope="row">
-          <Box gap={2} display="flex" alignItems="center">
-            {isEditing ? (
-              <>
-                <TextField
-                  size="small"
-                  name="first_name"
-                  value={editedRow.first_name || ''}
-                  onChange={handleChange}
-                  placeholder="First Name"
-                />
-                <TextField
-                  size="small"
-                  name="last_name"
-                  value={editedRow.last_name || ''}
-                  onChange={handleChange}
-                  placeholder="Last Name"
-                />
-              </>
-            ) : (
-              `${row.first_name} ${row.last_name}`
-            )}
-          </Box>
-        </TableCell>
-
         <TableCell>
           {isEditing ? (
             <TextField
               size="small"
-              type="date"
-              name="date_of_birth"
-              value={editedRow.date_of_birth ? editedRow.date_of_birth.substring(0, 10) : ''}
-              onChange={handleChange}
-            />
-          ) : row.date_of_birth ? (
-            new Date(row.date_of_birth).toISOString().substring(0, 10)
-          ) : (
-            'N/A'
-          )}
-        </TableCell>
-
-        <TableCell>
-          {isEditing ? (
-            <TextField
-              select
-              size="small"
-              name="gender"
-              value={editedRow.gender || ''}
-              onChange={handleChange}
-            >
-              <MenuItem value="Male">Male</MenuItem>
-              <MenuItem value="Female">Female</MenuItem>
-            </TextField>
-          ) : (
-            <p className="gender">{row.gender}</p>
-          )}
-        </TableCell>
-
-        <TableCell align="center">
-          {isEditing ? (
-            <TextField
-              size="small"
-              name="contact_number"
-              value={editedRow.contact_number || ''}
+              name="service_name"
+              value={editedRow.service_name || ''}
               onChange={handleChange}
             />
           ) : (
-            row.contact_number
+            row.service_name
           )}
         </TableCell>
 
@@ -192,25 +133,25 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
           {isEditing ? (
             <TextField
               size="small"
-              name="address"
-              value={editedRow.address || ''}
+              name="cost"
+              value={editedRow.cost || ''}
               onChange={handleChange}
             />
           ) : (
-            row.address
+            row.cost
           )}
         </TableCell>
 
         <TableCell>
           {isEditing ? (
             <TextField
-              size="small"
-              name="email"
-              value={editedRow.email || ''}
+              size="large"
+              name="description"
+              value={editedRow.description || ''}
               onChange={handleChange}
             />
           ) : (
-            row.email
+            row.description
           )}
         </TableCell>
 
@@ -255,7 +196,7 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
             Edit
           </MenuItem>
 
-          <MenuItem onClick={() => handleDelete(row.patient_id)} sx={{ color: 'error.main' }}>
+          <MenuItem onClick={() => handleDelete(row.service_id)} sx={{ color: 'error.main' }}>
             <Iconify icon="solar:trash-bin-trash-bold" />
             Delete
           </MenuItem>
@@ -265,16 +206,12 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
   );
 }
 
-PatientTableRow.propTypes = {
+ServiceTableRow.propTypes = {
   row: PropTypes.shape({
-    patient_id: PropTypes.number.isRequired,
-    first_name: PropTypes.string.isRequired,
-    last_name: PropTypes.string.isRequired,
-    date_of_birth: PropTypes.string.isRequired,
-    gender: PropTypes.string.isRequired,
-    contact_number: PropTypes.string.isRequired,
-    address: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
+    service_id: PropTypes.number.isRequired,
+    service_name: PropTypes.string.isRequired,
+    cost: PropTypes.number.isRequired,
+    description: PropTypes.string.isRequired,
   }).isRequired,
   selected: PropTypes.bool.isRequired,
   onSelectRow: PropTypes.func.isRequired,

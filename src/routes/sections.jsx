@@ -19,6 +19,8 @@ export const PatientPage = lazy(() => import("../pages/patients"));
 export const SignInPage = lazy(() => import("../pages/sign-in"));
 export const SignUpPage = lazy(() => import("../pages/sign-up"));
 export const DoctorsPage = lazy(() => import("../pages/doctors"));
+export const StaffPage = lazy(() => import("../pages/staff"));
+export const ServicePage = lazy(() => import("../pages/services"));
 export const Page404 = lazy(() => import("../pages/page-not-found"));
 
 // ----------------------------------------------------------------------
@@ -77,6 +79,8 @@ export function Router() {
             { element: <HomePage />, index: true },
             { path: "patients", element: <PatientPage /> },
             { path: "doctors", element: <DoctorsPage /> },
+            { path: "staff", element: <StaffPage /> },
+            { path: "services", element: <ServicePage /> },
           ],
         },
       ],

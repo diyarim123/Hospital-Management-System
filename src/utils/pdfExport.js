@@ -74,3 +74,67 @@ export const exportDoctorsToPDF = (dataFiltered) => {
 
   doc.save('doctors.pdf');
 };
+
+export const exportStaffToPDF = (dataFiltered) => {
+  const doc = new JsPDF(); 
+
+  doc.text('Staff List', 14, 16);
+
+  const tableColumn = [
+    'First Name',
+    'Last Name',
+    'Role',
+    'Gender',
+    'Phone',
+    'Department',
+  ];
+
+  const tableRows = dataFiltered.map((staff) => [
+    staff.first_name,
+    staff.last_name,
+    staff.role,
+    staff.gender,
+    staff.contact_number,
+    staff.department_name
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 22,
+    theme: 'grid',
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+  });
+
+  doc.save('staff.pdf');
+};
+
+export const exportServicesToPDF = (dataFiltered) => {
+  const doc = new JsPDF(); 
+
+  doc.text('Services List', 14, 16);
+
+  const tableColumn = [
+    'Service Name',
+    'Cost',
+    'Description'
+  ];
+
+  const tableRows = dataFiltered.map((service) => [
+    service.service_name,
+    service.cost,
+    service.description
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 22,
+    theme: 'grid',
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+  });
+
+  doc.save('services.pdf');
+};
