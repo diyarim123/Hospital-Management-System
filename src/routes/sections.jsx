@@ -21,6 +21,10 @@ export const SignUpPage = lazy(() => import("../pages/sign-up"));
 export const DoctorsPage = lazy(() => import("../pages/doctors"));
 export const StaffPage = lazy(() => import("../pages/staff"));
 export const ServicePage = lazy(() => import("../pages/services"));
+export const DepartmentPage = lazy(() => import("../pages/departments"));
+export const RecordPage = lazy(() => import("../pages/records"));
+export const AppointmentPage = lazy(() => import("../pages/appointments"));
+export const RoomPage = lazy(() => import("../pages/rooms"));
 export const Page404 = lazy(() => import("../pages/page-not-found"));
 
 // ----------------------------------------------------------------------
@@ -81,6 +85,10 @@ export function Router() {
             { path: "doctors", element: <DoctorsPage /> },
             { path: "staff", element: <StaffPage /> },
             { path: "services", element: <ServicePage /> },
+            { path: "departments", element: <DepartmentPage /> },
+            { path: "rooms", element: <RoomPage /> },
+            { path: "records", element: <RecordPage /> },
+            { path: "appointments", element: <AppointmentPage /> }
           ],
         },
       ],

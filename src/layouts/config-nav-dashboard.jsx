@@ -1,4 +1,3 @@
-import { Label } from '../components/label';
 import { SvgColor } from '../components/svg-color';
 
 // ----------------------------------------------------------------------
@@ -34,18 +33,23 @@ export const navData = [
     icon: icon('services'),
   },
   {
-    title: 'Appointments',
-    path: '/appointments',
-    icon: icon('appointment'),
+    title: 'Departments',
+    path: '/departments',
+    icon: icon('department'),
   },
   {
-    title: 'Medical Records',
-    path: '/medical-records',
+    title: 'Rooms',
+    path: '/rooms',
+    icon: icon('room'),
+  },
+  {
+    title: 'Records',
+    path: '/records',
     icon: icon('medical_record')
   },
   {
-    title: 'Sign in',
-    path: '/sign-in',
-    icon: icon('log-in'),
+    title: 'Appointments',
+    path: '/appointments',
+    icon: icon('appointments')
   }
 ];

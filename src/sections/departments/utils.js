@@ -52,7 +52,7 @@ export function applyFilter({ inputData, comparator, filterName }) {
 
   if (filterName) {
     filteredData = filteredData.filter(
-      (service) => service.service_name.toLowerCase().includes(filterName.toLowerCase())
+      (department) => department.department_name.toLowerCase().includes(filterName.toLowerCase())
     );
   }
 

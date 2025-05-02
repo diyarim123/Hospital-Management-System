@@ -138,3 +138,134 @@ export const exportServicesToPDF = (dataFiltered) => {
 
   doc.save('services.pdf');
 };
+
+
+export const exportDepartmentsToPDF = (dataFiltered) => {
+  const doc = new JsPDF(); 
+
+  doc.text('Departments List', 14, 16);
+
+  const tableColumn = [
+    'Department',
+    'Description'
+  ];
+
+  const tableRows = dataFiltered.map((department) => [
+    department.department_name,
+    department.description
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 22,
+    theme: 'grid',
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+  });
+
+  doc.save('departments.pdf');
+};
+
+
+export const exportRoomsToPDF = (dataFiltered) => {
+  const doc = new JsPDF(); 
+
+  doc.text('Rooms List', 14, 16);
+
+  const tableColumn = [
+    'Room Number',
+    'Room Type',
+    'Capacity',
+    'Availability'
+  ];
+
+  const tableRows = dataFiltered.map((room) => [
+    room.room_number,
+    room.room_type,
+    room.capacity,
+    room.availability_type
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 22,
+    theme: 'grid',
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+  });
+
+  doc.save('rooms.pdf');
+};
+
+
+export const exportRecordsToPDF = (dataFiltered) => {
+  const doc = new JsPDF(); 
+
+  doc.text('Record List', 14, 16);
+
+  const tableColumn = [
+    "Diagnosis",
+    "Treatment",
+    "Prescription",
+    "Record Date",
+    "Patient Name",
+    "Doctor Name",
+  ];
+
+  const tableRows = dataFiltered.map((record) => [
+    record.diagnosis,
+    record.treatment,
+    record.prescription,
+    record.record_date
+      ? new Date(record.record_date).toISOString().substring(0, 10)
+      : 'N/A',
+      `${record.patient_first_name} + ${record.patient.last_name}`,
+      `${record.doctor_first_name} + ${record.doctor.last_name}`,
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 22,
+    theme: 'grid',
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+  });
+
+  doc.save('records.pdf');
+};
+
+export const exportAppointmentsToPDF = (dataFiltered) => {
+  const doc = new JsPDF(); 
+
+  doc.text('Appointments List', 14, 16);
+
+  const tableColumn = [
+    "Status",
+    "Appointment Time",
+    "Patient Name",
+    "Doctor Name",
+  ];
+
+  const tableRows = dataFiltered.map((appointment) => [
+    appointment.status,
+    appointment.appointment_time
+      ? new Date(appointment.appointment_time).toISOString().substring(0, 10)
+      : 'N/A',
+    `${appointment.patient_first_name} + ${appointment.patient.last_name}`,
+    `${appointment.doctor_first_name} + ${appointment.doctor.last_name}`,
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 22,
+    theme: 'grid',
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+  });
+
+  doc.save('appointments.pdf');
+};

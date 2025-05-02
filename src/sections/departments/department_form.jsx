@@ -7,14 +7,13 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { TextField, Button } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { postService } from '../../redux/services/serviceRequests';
+import { postDepartment } from '../../redux/departments/departmentRequests';
 
-const ServiceForm = ({isOpen, handleModal}) => {
+const DepartmentForm = ({isOpen, handleModal}) => {
   const dispatch = useDispatch();
   const [showWarning, setShowWarning] = useState(false);
   const [formData, setFormData] = useState({
-    service_name: '',
-    cost: '',
+    department_name: '',
     description: ''
   });
 
@@ -35,10 +34,10 @@ const ServiceForm = ({isOpen, handleModal}) => {
       return;
     }
 
-    const result = await dispatch(postService(formData));
+    const result = await dispatch(postDepartment(formData));
 
     if (result.meta.requestStatus === 'fulfilled') {
-      toast.success('Service added successfully', {
+      toast.success('Department added successfully', {
         position: 'top-center',
         autoClose: 2000,
         hideProgressBar: false,
@@ -57,31 +56,15 @@ const ServiceForm = ({isOpen, handleModal}) => {
   return (
     <form onSubmit={handleSubmit}>
       <TextField
-        label="Service Name"
+        label="Department"
         variant="outlined"
-        name="service_name"
-        value={formData.service_name}
+        name="department_name"
+        value={formData.department_name}
         onChange={handleChange}
         fullWidth
         sx={{ mb: 2 }}
-        error={showWarning && formData.service_name === ''}
-        helperText={showWarning && formData.service_name === '' ? 'This field is required' : ''}
-        required
-      />
-      <br />
-      <TextField
-        label="Cost"
-        variant="outlined"
-        name="cost"
-        value={formData.cost}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
-        sx={{ mb: 2 }}
-        error={showWarning && formData.cost === ''}
-        helperText={showWarning && formData.cost === '' ? 'This field is required' : ''}
+        error={showWarning && formData.department_name === ''}
+        helperText={showWarning && formData.department_name === '' ? 'This field is required' : ''}
         required
       />
       <br />
@@ -92,6 +75,7 @@ const ServiceForm = ({isOpen, handleModal}) => {
         value={formData.description}
         onChange={handleChange}
         fullWidth
+        sx={{ mb: 2 }}
         error={showWarning && formData.description === ''}
         helperText={showWarning && formData.description === '' ? 'This field is required' : ''}
         required
@@ -102,7 +86,7 @@ const ServiceForm = ({isOpen, handleModal}) => {
         type="submit"
         color="primary"
         disabled={isFormEmpty}
-        sx={{ float: 'right', mt: 2 }} // Float the button to the right
+        sx={{ float: 'right' }} // Float the button to the right
       >
         Submit
       </Button>
@@ -110,9 +94,9 @@ const ServiceForm = ({isOpen, handleModal}) => {
   );
 };
 
-export default ServiceForm;
+export default DepartmentForm;
 
-ServiceForm.propTypes = {
+DepartmentForm.propTypes = {
   isOpen: PropTypes.bool,
   handleModal: PropTypes.func
 }

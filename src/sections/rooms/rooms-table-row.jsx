@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 // Toast notifications
 import { toast } from 'react-toastify';
@@ -18,22 +18,16 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
 import { Iconify } from '../../components/iconify';
-import { deleteDoctor, updateDoctor } from '../../redux/doctors/doctorsRequests';
-import { getDepartments } from '../../redux/departments/departmentRequests';
+import { deleteRoom, updateRoom } from '../../redux/rooms/roomRequests';
 
 // ----------------------------------------------------------------------
 
-export function DoctorTableRow({ row, selected, onSelectRow }) {
+export function RoomTableRow({ row, selected, onSelectRow }) {
   const [openPopover, setOpenPopover] = useState(null);
-  const [departmentsReady, setDepartmentsReady] = useState(false);
   const dispatch = useDispatch();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedRow, setEditedRow] = useState({ ...row });
-
-  const { departments_loading, departments_data, departments_err } = useSelector(
-    (state) => state.departments
-  );
 
   const handleOpenPopover = useCallback((event) => {
     setOpenPopover(event.currentTarget);
@@ -45,8 +39,8 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
 
   const handleDelete = async (id) => {
     try {
-      await dispatch(deleteDoctor(id));
-      toast.success('Doctor deleted successfully', {
+      await dispatch(deleteRoom(id));
+      toast.success('Room deleted successfully', {
         position: 'top-center',
         autoClose: 2000,
         hideProgressBar: false,
@@ -57,8 +51,6 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
         theme: 'light',
       });
     } catch (error) {
-      console.log('id', id);
-      console.log(error);
       toast.error('Delete failed!', {
         position: 'top-center',
         autoClose: 1500,
@@ -72,49 +64,28 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
     }
   };
 
-  const handleEdit = async () => {
+  const handleEdit = () => {
+    setIsEditing(true);
     handleClosePopover();
-    setDepartmentsReady(false); // Reset departmentsReady before fetching
-
-    const result = await dispatch(getDepartments());
-
-    if (result.meta.requestStatus === 'fulfilled') {
-      setDepartmentsReady(true); // Now departments are ready
-      setIsEditing(true);
-    } else {
-      toast.error('Failed to load departments', {
-        position: 'top-center',
-        autoClose: 1500,
-        hideProgressBar: false,
-        theme: 'light',
-      });
-    }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditedRow((prev) => ({
       ...prev,
-      [name]: name === 'contact_number' ? value.replace(/\D/g, '') : value, // Ensure contact number is numeric
+      [name]: value,
     }));
   };
 
   const handleSave = async () => {
-    // Find the selected department name based on the new department_id
-    const selectedDepartment = departments_data.find(
-      (dept) => dept.department_id === editedRow.department_id
-    );
-  
-    const updatedDoctor = {
-      ...editedRow,
-      department_name: selectedDepartment ? selectedDepartment.department_name : row.department_name,
+    const updatedRoom = {
+      ...editedRow
     };
-  
-    const result = await dispatch(updateDoctor(updatedDoctor));
-  
+
+    const result = await dispatch(updateRoom(updatedRoom));
+
     if (result.meta.requestStatus === 'fulfilled') {
-      setIsEditing(false); // Exit edit mode after successful save
-      toast.success('Doctor updated successfully', {
+      toast.success('Room updated successfully', {
         position: 'top-center',
         autoClose: 2000,
         hideProgressBar: false,
@@ -124,9 +95,6 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
         progress: undefined,
         theme: 'light',
       });
-  
-      // Also update editedRow to reflect the correct department name immediately
-      setEditedRow(updatedDoctor);
     } else {
       toast.error('Update failed!', {
         position: 'top-center',
@@ -140,7 +108,6 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
       });
     }
   };
-  
 
   return (
     <>
@@ -149,99 +116,58 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
           <Checkbox disableRipple checked={selected} onChange={onSelectRow} />
         </TableCell>
 
-        <TableCell component="th" scope="row">
-          <Box gap={2} display="flex" alignItems="center">
-            {isEditing ? (
-              <>
-                <TextField
-                  size="small"
-                  name="first_name"
-                  value={editedRow.first_name || ''}
-                  onChange={handleChange}
-                  placeholder="First Name"
-                  fullWidth
-                />
-                <TextField
-                  size="small"
-                  name="last_name"
-                  value={editedRow.last_name || ''}
-                  onChange={handleChange}
-                  placeholder="Last Name"
-                  fullWidth
-                />
-              </>
-            ) : (
-              `${row.first_name} ${row.last_name}`
-            )}
-          </Box>
+        <TableCell>
+          {isEditing ? (
+            <TextField
+              size="small"
+              name="room_number"
+              value={editedRow.room_number || ''}
+              onChange={handleChange}
+            />
+          ) : (
+            <p className="room_number">{row.room_number}</p>
+          )}
         </TableCell>
 
         <TableCell>
           {isEditing ? (
             <TextField
               size="small"
-              name="specialization"
-              value={editedRow.specialization || ''}
+              name="room_type"
+              value={editedRow.room_type || ''}
               onChange={handleChange}
               fullWidth
             />
           ) : (
-            <p className="specialization">{row.specialization}</p>
+            row.room_type
           )}
         </TableCell>
 
         <TableCell>
           {isEditing ? (
             <TextField
-              select
               size="small"
-              name="gender"
-              value={editedRow.gender || ''}
-              onChange={handleChange}
-            >
-              <MenuItem value="Male">Male</MenuItem>
-              <MenuItem value="Female">Female</MenuItem>
-            </TextField>
-          ) : (
-            <p className="gender">{row.gender}</p>
-          )}
-        </TableCell>
-
-        <TableCell align="center">
-          {isEditing ? (
-            <TextField
-              size="small"
-              name="contact_number"
-              value={editedRow.contact_number || ''}
+              name="capacity"
+              value={editedRow.capacity || ''}
               onChange={handleChange}
               fullWidth
             />
           ) : (
-            row.contact_number
+            row.capacity
           )}
         </TableCell>
 
         <TableCell>
           {isEditing ? (
-            departmentsReady ? (
-              <TextField
-                select
-                size="small"
-                name="department_id"
-                value={editedRow.department_id || ''}
-                onChange={handleChange}
-              >
-                {departments_data?.map((dept) => (
-                  <MenuItem key={dept.department_id} value={dept.department_id}>
-                    {dept.department_name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            ) : (
-              <TextField size="small" disabled value="Loading departments..." />
-            )
+            <TextField
+              size="small"
+              name="availability_type"
+              value={editedRow.availability_type || ''}
+              onChange={handleChange}
+              fullWidth
+            />
           ) : (
-            <p className="department_name">{editedRow.department_name || row.department_name}</p>
+            row.availability_type
           )}
         </TableCell>
 
@@ -286,7 +212,7 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
             Edit
           </MenuItem>
 
-          <MenuItem onClick={() => handleDelete(row.doctor_id)} sx={{ color: 'error.main' }}>
+          <MenuItem onClick={() => handleDelete(row.room_id)} sx={{ color: 'error.main' }}>
             <Iconify icon="solar:trash-bin-trash-bold" />
             Delete
           </MenuItem>
@@ -296,16 +222,13 @@ export function DoctorTableRow({ row, selected, onSelectRow }) {
   );
 }
 
-DoctorTableRow.propTypes = {
+RoomTableRow.propTypes = {
   row: PropTypes.shape({
-    doctor_id: PropTypes.number.isRequired,
-    first_name: PropTypes.string.isRequired,
-    last_name: PropTypes.string.isRequired,
-    specialization: PropTypes.string.isRequired,
-    gender: PropTypes.string.isRequired,
-    contact_number: PropTypes.string.isRequired,
-    department_id: PropTypes.number.isRequired,
-    department_name: PropTypes.string.isRequired,
+    room_id: PropTypes.number.isRequired,
+    room_number: PropTypes.number.isRequired,
+    room_type: PropTypes.string.isRequired,
+    capacity: PropTypes.number.isRequired,
+    availability_type: PropTypes.string.isRequired
   }).isRequired,
   selected: PropTypes.bool.isRequired,
   onSelectRow: PropTypes.func.isRequired,

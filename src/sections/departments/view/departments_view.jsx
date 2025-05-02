@@ -14,24 +14,24 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Iconify } from '../../../components/iconify';
 import { Scrollbar } from '../../../components/scrollbar';
 import { DashboardContent } from '../../../layouts/dashboard';
-import ModalUnstyled from '../services-modal';
+import ModalUnstyled from '../departments-modal';
 
 import { TableNoData } from '../table-no-data';
-import { ServiceTableRow } from '../services-table-row';
-import { ServiceTableHead } from '../services-table-head';
+import { DepartmentTableRow } from '../departments-table-row';
+import { DepartmentTableHead } from '../departments-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
-import { ServiceTableToolbar } from '../services-table-toolbar';
+import { DepartmentTableToolbar } from '../departments-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
-import { getServices } from '../../../redux/services/serviceRequests';
+import { getDepartments } from '../../../redux/departments/departmentRequests';
 
 // js pdf imports
-import { exportServicesToPDF } from '../../../utils/pdfExport';
+import { exportDepartmentsToPDF } from '../../../utils/pdfExport';
 
 // ----------------------------------------------------------------------
 
 export function useTable() {
   const [page, setPage] = useState(0);
-  const [orderBy, setOrderBy] = useState('service_name');
+  const [orderBy, setOrderBy] = useState('department_name');
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selected, setSelected] = useState([]);
   const [order, setOrder] = useState('asc');
@@ -97,41 +97,41 @@ export function useTable() {
 
 // ----------------------------------------------------------------------
 
-export function ServicesView({ handleModal }) {
+export function DepartmentsView({ handleModal }) {
   const [isOpen, setIsOpen] = useState(false);
   const table = useTable();
   const [filterName, setFilterName] = useState('');
-  const { services_loading, services_data, services_err } = useSelector((state) => state.services);
+  const { departments_loading, departments_data, departments_err } = useSelector((state) => state.departments);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getServices());
+    dispatch(getDepartments());
   }, [dispatch]);
 
   const dataFiltered = useMemo(
     () =>
       applyFilter({
-        inputData: services_data || [],
+        inputData: departments_data || [],
         comparator: getComparator(table.order, table.orderBy),
         filterName,
       }),
-    [services_data, table, filterName]
+    [departments_data, table, filterName]
   );
 
   const Modal = isOpen ? <ModalUnstyled isOpen={isOpen} /> : null;
   const notFound = !dataFiltered.length && !!filterName;
 
   const handleRetry = () => {
-    dispatch(getServices());
+    dispatch(getDepartments());
   };
 
   const handleExportPDF = () => {
-    exportServicesToPDF(dataFiltered);
+    exportDepartmentsToPDF(dataFiltered);
   };
 
   return (
     <DashboardContent>
-      {services_err ? (
+      {departments_err ? (
         <Box
           display="flex"
           flexDirection="column"
@@ -140,7 +140,7 @@ export function ServicesView({ handleModal }) {
           height="100%"
         >
           <Typography color="error" align="center" variant="h6">
-            {services_err}
+            {departments_err}
           </Typography>
           <Button
             variant="contained"
@@ -155,7 +155,7 @@ export function ServicesView({ handleModal }) {
         <>
           <Box display="flex" alignItems="center" mb={5}>
             <Typography variant="h4" flexGrow={1}>
-              Services
+              Departments
             </Typography>
             <Button
               variant="contained"
@@ -163,12 +163,12 @@ export function ServicesView({ handleModal }) {
               startIcon={<Iconify icon="mingcute:add-line" />}
               onClick={handleModal}
             >
-              New Service
+              New Department
             </Button>
           </Box>
 
           <Card>
-            <ServiceTableToolbar
+            <DepartmentTableToolbar
               numSelected={table.selected.length}
               filterName={filterName}
               onFilterName={(event) => {
@@ -180,23 +180,22 @@ export function ServicesView({ handleModal }) {
             <Scrollbar>
               <TableContainer sx={{ overflow: 'unset' }}>
                 <Table sx={{ minWidth: 800 }}>
-                  <ServiceTableHead
+                  <DepartmentTableHead
                     order={table.order}
                     orderBy={table.orderBy}
-                    rowCount={services_data?.length || 0}
+                    rowCount={departments_data?.length || 0}
                     numSelected={table.selected.length}
                     onSort={table.onSort}
                     onSelectAllRows={(checked) =>
-                      table.onSelectAllRows(checked, services_data?.map((user) => user.id) || [])
+                      table.onSelectAllRows(checked, departments_data?.map((user) => user.id) || [])
                     }
                     headLabel={[
-                      { id: 'service_name', label: 'Service Name' },
-                      { id: 'cost', label: 'Cost' },
+                      { id: 'department_name', label: 'Department' },
                       { id: 'description', label: 'Description' }
                     ]}
                   />
                   <TableBody>
-                    {services_loading ? (
+                    {departments_loading ? (
                       <TableNoData />
                     ) : (
                       dataFiltered
@@ -205,7 +204,7 @@ export function ServicesView({ handleModal }) {
                           table.page * table.rowsPerPage + table.rowsPerPage
                         )
                         .map((row) => (
-                          <ServiceTableRow
+                          <DepartmentTableRow
                             key={row.id}
                             row={row}
                             selected={table.selected.includes(row.id)}
@@ -219,7 +218,7 @@ export function ServicesView({ handleModal }) {
                       emptyRows={emptyRows(
                         table.page,
                         table.rowsPerPage,
-                        services_data?.length || 0
+                        departments_data?.length || 0
                       )}
                     />
 
@@ -232,7 +231,7 @@ export function ServicesView({ handleModal }) {
             <TablePagination
               component="div"
               page={table.page}
-              count={services_data?.length || 0}
+              count={departments_data?.length || 0}
               rowsPerPage={table.rowsPerPage}
               onPageChange={table.onChangePage}
               rowsPerPageOptions={[5, 10, 25]}
@@ -247,10 +246,10 @@ export function ServicesView({ handleModal }) {
         startIcon={<Iconify icon="mdi:file-pdf-box" />}
         onClick={handleExportPDF}
         sx={{
-          ml: 2,
-          mt: 3,
-          width: '180px',
-          alignSelf: 'flex-end',
+          ml: 2, // margin-left
+          mt: 3, // margin-top to separate from the table
+          width: '180px', // custom width
+          alignSelf: 'flex-end', // push to right side if inside a flex container
         }}
       >
         Export PDF
@@ -259,6 +258,6 @@ export function ServicesView({ handleModal }) {
   );
 }
 
-ServicesView.propTypes = {
+DepartmentsView.propTypes = {
   handleModal: PropTypes.func,
 };

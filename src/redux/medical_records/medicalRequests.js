@@ -50,6 +50,9 @@ export const updateMedical = createAsyncThunk(
     try {
       const token = getState().auth.token; // Get token from Redux store
 
+      console.log("the url" , `${URL}/${data.record_id}`); 
+
+
       const response = await axios.patch(`${URL}/${data.record_id}`, data, {
         headers: {
           'Content-Type': 'application/json',

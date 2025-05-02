@@ -127,6 +127,7 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
                   value={editedRow.first_name || ''}
                   onChange={handleChange}
                   placeholder="First Name"
+                  fullWidth
                 />
                 <TextField
                   size="small"
@@ -134,6 +135,7 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
                   value={editedRow.last_name || ''}
                   onChange={handleChange}
                   placeholder="Last Name"
+                  fullWidth
                 />
               </>
             ) : (
@@ -150,6 +152,7 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
               name="date_of_birth"
               value={editedRow.date_of_birth ? editedRow.date_of_birth.substring(0, 10) : ''}
               onChange={handleChange}
+              fullWidth
             />
           ) : row.date_of_birth ? (
             new Date(row.date_of_birth).toISOString().substring(0, 10)
@@ -182,6 +185,7 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
               name="contact_number"
               value={editedRow.contact_number || ''}
               onChange={handleChange}
+              fullWidth
             />
           ) : (
             row.contact_number
@@ -195,6 +199,7 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
               name="address"
               value={editedRow.address || ''}
               onChange={handleChange}
+              fullWidth
             />
           ) : (
             row.address
@@ -208,6 +213,7 @@ export function PatientTableRow({ row, selected, onSelectRow }) {
               name="email"
               value={editedRow.email || ''}
               onChange={handleChange}
+              fullWidth
             />
           ) : (
             row.email

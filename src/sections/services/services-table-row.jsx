@@ -123,6 +123,7 @@ export function ServiceTableRow({ row, selected, onSelectRow }) {
               name="service_name"
               value={editedRow.service_name || ''}
               onChange={handleChange}
+              fullWidth
             />
           ) : (
             row.service_name
@@ -149,6 +150,7 @@ export function ServiceTableRow({ row, selected, onSelectRow }) {
               name="description"
               value={editedRow.description || ''}
               onChange={handleChange}
+              fullWidth
             />
           ) : (
             row.description

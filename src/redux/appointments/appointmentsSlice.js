@@ -21,7 +21,7 @@ const AppointmentsSlice = createSlice({
     });
     builder.addCase(getAppointments.fulfilled, (state, action) => {
       state.appointments_loading = false;
-      state.appointments_data = action.payload;
+      state.appointments_data = action.payload.result;
       state.appointments_err = '';
     });
     builder.addCase(getAppointments.rejected, (state, action) => {

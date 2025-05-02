@@ -52,7 +52,7 @@ export function applyFilter({ inputData, comparator, filterName }) {
 
   if (filterName) {
     filteredData = filteredData.filter(
-      (patient) => patient.first_name.toLowerCase().includes(filterName.toLowerCase())
+      (staff) => staff.first_name.toLowerCase().includes(filterName.toLowerCase())
     );
   }
 
