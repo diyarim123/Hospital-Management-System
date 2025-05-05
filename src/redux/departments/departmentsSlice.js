@@ -13,6 +13,13 @@ const initialState = {
 const DepartmentsSlice = createSlice({
   name: 'departments',
   initialState,
+  reducers: {
+    reset: (state) => {
+      state.departments_loading = false;
+      state.departments_data = [];
+      state.departments_err = '';
+    },
+  },
   extraReducers: (builder) => {
     // Fetch Departments
     builder.addCase(getDepartments.pending, (state) => {
@@ -76,4 +83,6 @@ const DepartmentsSlice = createSlice({
   },
 });
 
+
+export const { reset } = DepartmentsSlice.actions;
 export default DepartmentsSlice.reducer;

@@ -13,6 +13,13 @@ const initialState = {
 const StaffSlice = createSlice({
   name: 'staff',
   initialState,
+  reducers: {
+    reset: (state) => {
+      state.staff_loading = false;
+      state.staff_data = [];
+      state.staff_err = '';
+    },
+  },
   extraReducers: (builder) => {
     // Fetch Staff
     builder.addCase(getStaff.pending, (state) => {
@@ -75,4 +82,5 @@ const StaffSlice = createSlice({
   },
 });
 
+export const { reset } = StaffSlice.actions;
 export default StaffSlice.reducer;

@@ -13,6 +13,13 @@ const initialState = {
 const BillingsSlice = createSlice({
   name: 'billings',
   initialState,
+  reducers: {
+    reset: (state) => {
+      state.billings_loading = false;
+      state.billings_data = [];
+      state.billings_err = '';
+    },
+  },
   extraReducers: (builder) => {
     // Fetch Billings
     builder.addCase(getBillings.pending, (state) => {
@@ -76,4 +83,5 @@ const BillingsSlice = createSlice({
   },
 });
 
+export const { reset } = BillingsSlice.actions;
 export default BillingsSlice.reducer;

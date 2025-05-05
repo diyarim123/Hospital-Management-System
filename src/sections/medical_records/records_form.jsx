@@ -20,13 +20,15 @@ const RecordForm = ({ isOpen, handleModal }) => {
 
   const [formData, setFormData] = useState({
     patient_id: null,
-    patient_name: '',
+    patient_first_name: '',
+    patient_last_name: '',
     doctor_id: null,
-    doctor_name: '',
+    doctor_first_name: '',
+    doctor_last_name: '',
     diagnosis: '',
     treatment: '',
     prescription: '',
-    record_date: '', // manual input
+    record_date: '',
   });
 
   useEffect(() => {
@@ -52,7 +54,7 @@ const RecordForm = ({ isOpen, handleModal }) => {
       return;
     }
 
-    console.log("Submitting form data:", formData);
+    console.log('Submitting form data:', formData);
 
     const result = await dispatch(postMedical(formData));
 
@@ -91,14 +93,13 @@ const RecordForm = ({ isOpen, handleModal }) => {
         disablePortal
         options={patients_data || []}
         getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
-        value={
-          (patients_data || []).find((p) => p.patient_id === formData.patient_id) || null
-        }
+        value={(patients_data || []).find((p) => p.patient_id === formData.patient_id) || null}
         onChange={(event, newValue) => {
           setFormData({
             ...formData,
             patient_id: newValue ? newValue.patient_id : null,
-            patient_name: newValue ? `${newValue.first_name} ${newValue.last_name}` : '',
+            patient_first_name: newValue ? newValue.first_name : '',
+            patient_last_name: newValue ? newValue.last_name : '',
           });
         }}
         renderInput={(params) => (
@@ -118,14 +119,13 @@ const RecordForm = ({ isOpen, handleModal }) => {
         disablePortal
         options={doctors_data || []}
         getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
-        value={
-          (doctors_data || []).find((d) => d.doctor_id === formData.doctor_id) || null
-        }
+        value={(doctors_data || []).find((d) => d.doctor_id === formData.doctor_id) || null}
         onChange={(event, newValue) => {
           setFormData({
             ...formData,
             doctor_id: newValue ? newValue.doctor_id : null,
-            doctor_name: newValue ? `${newValue.first_name} ${newValue.last_name}` : '',
+            doctor_first_name: newValue ? newValue.first_name : '',
+            doctor_last_name: newValue ? newValue.last_name : '',
           });
         }}
         renderInput={(params) => (
@@ -186,11 +186,14 @@ const RecordForm = ({ isOpen, handleModal }) => {
       <TextField
         label="Record Date"
         variant="outlined"
+        type="date"
         name="record_date"
-        placeholder="YYYY-MM-DD"
         value={formData.record_date}
         onChange={handleChange}
         fullWidth
+        InputLabelProps={{
+          shrink: true,
+        }}
         error={showWarning && formData.record_date === ''}
         helperText={showWarning && formData.record_date === '' ? 'This field is required' : ''}
         required

@@ -5,7 +5,6 @@ import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 
 import { _langs } from '../../_mock';
-
 import { Iconify } from '../../components/iconify';
 import { Main } from './main';
 import { layoutClasses } from '../classes';
@@ -20,6 +19,7 @@ import { LanguagePopover } from '../components/language-popover';
 
 
 // ----------------------------------------------------------------------
+
 
 export function DashboardLayout({ sx, children, header }) {
   const theme = useTheme();

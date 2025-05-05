@@ -51,5 +51,10 @@ export const navData = [
     title: 'Appointments',
     path: '/appointments',
     icon: icon('appointments')
+  },
+  {
+    title: 'Billings',
+    path: '/billings',
+    icon: icon('billings')
   }
 ];

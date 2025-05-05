@@ -8,32 +8,27 @@ import { TextField, Button, Autocomplete } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { getPatients } from '../../redux/patients/patientRequests';
-import { getDoctors } from '../../redux/doctors/doctorsRequests';
-import { postAppointment } from '../../redux/appointments/appointmentsRequests';
+import { postBilling } from '../../redux/billings/billingRequests';
 
-const StatusOptions = ['Scheduled', 'Canceled', 'Completed'];
+const StatusOptions = ['Paid', 'Not Paid', 'Insurance'];
 
-const AppointmentForm = ({ isOpen, handleModal }) => {
+const BillingForm = ({ isOpen, handleModal }) => {
   const dispatch = useDispatch();
   const [showWarning, setShowWarning] = useState(false);
 
   const { patients_data } = useSelector((state) => state.patients);
-  const { doctors_data } = useSelector((state) => state.doctors);
 
   const [formData, setFormData] = useState({
     patient_id: null,
+    amount: '',
+    payment_status: '',
+    bill_date: '',
     patient_first_name: '',
     patient_last_name: '',
-    doctor_id: null,
-    doctor_first_name: '',
-    doctor_last_name: '',
-    appointment_time: '',
-    status: '',
   });
 
   useEffect(() => {
     dispatch(getPatients());
-    dispatch(getDoctors());
   }, [dispatch]);
 
   const handleChange = (event) => {
@@ -56,10 +51,10 @@ const AppointmentForm = ({ isOpen, handleModal }) => {
 
     console.log('submitting data', formData);
 
-    const result = await dispatch(postAppointment(formData));
+    const result = await dispatch(postBilling(formData));
 
     if (result.meta.requestStatus === 'fulfilled') {
-      toast.success('Appointment added successfully', {
+      toast.success('Bill added successfully', {
         position: 'top-center',
         autoClose: 2000,
         hideProgressBar: false,
@@ -71,7 +66,7 @@ const AppointmentForm = ({ isOpen, handleModal }) => {
       });
       handleModal(false);
     } else {
-      toast.error('Failed to add appointment', {
+      toast.error('Failed to add bill', {
         position: 'top-center',
         autoClose: 2000,
         hideProgressBar: false,
@@ -115,70 +110,62 @@ const AppointmentForm = ({ isOpen, handleModal }) => {
         sx={{ mb: 2 }}
       />
 
-      {/* Select Doctor */}
-      <Autocomplete
-        disablePortal
-        options={doctors_data || []}
-        getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
-        value={(doctors_data || []).find((d) => d.doctor_id === formData.doctor_id) || null}
-        onChange={(event, newValue) => {
-          setFormData({
-            ...formData,
-            doctor_id: newValue ? newValue.doctor_id : null,
-            doctor_first_name: newValue ? newValue.first_name : '',
-            doctor_last_name: newValue ? newValue.last_name : '',
-          });
-        }}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Doctor"
-            error={showWarning && !formData.doctor_id}
-            helperText={showWarning && !formData.doctor_id ? 'This field is required' : ''}
-            required
-          />
-        )}
-        sx={{ mb: 2 }}
-      />
-
       <br />
       <Autocomplete
         disablePortal
         options={StatusOptions}
-        name="status"
-        value={formData.status}
+        name="payment_status"
+        value={formData.payment_status}
         onChange={(event, newValue) =>
           setFormData({
             ...formData,
-            status: newValue || '',
+            payment_status: newValue || '',
           })
         }
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Status"
-            error={showWarning && formData.status === ''}
-            helperText={showWarning && formData.status === '' ? 'This field is required' : ''}
+            label="Payment Status"
+            error={showWarning && formData.payment_status === ''}
+            helperText={
+              showWarning && formData.payment_status === '' ? 'This field is required' : ''
+            }
             required
           />
         )}
       />
       <br />
       <TextField
-        label="Appointment Time"
+        label="Amount"
         variant="outlined"
-        type="date"
-        name="appointment_time"
-        value={formData.appointment_time}
+        name="amount"
+        value={formData.amount}
         onChange={handleChange}
         fullWidth
         InputLabelProps={{
           shrink: true,
         }}
-        error={showWarning && formData.appointment_time === ''}
-        helperText={showWarning && formData.appointment_time === '' ? 'This field is required' : ''}
-        required
         sx={{ mb: 2 }}
+        error={showWarning && formData.amount === ''}
+        helperText={showWarning && formData.amount === '' ? 'This field is required' : ''}
+        required
+      />
+      <br />
+      <TextField
+        label="Bill Date"
+        variant="outlined"
+        type="date"
+        name="bill_date"
+        value={formData.bill_date}
+        onChange={handleChange}
+        fullWidth
+        InputLabelProps={{
+          shrink: true,
+        }}
+        sx={{ mb: 2 }}
+        error={showWarning && formData.bill_date === ''}
+        helperText={showWarning && formData.bill_date === '' ? 'This field is required' : ''}
+        required
       />
       <br />
       <Button
@@ -194,9 +181,9 @@ const AppointmentForm = ({ isOpen, handleModal }) => {
   );
 };
 
-export default AppointmentForm;
+export default BillingForm;
 
-AppointmentForm.propTypes = {
+BillingForm.propTypes = {
   isOpen: PropTypes.bool,
   handleModal: PropTypes.func,
 };

@@ -76,9 +76,6 @@ const ServiceForm = ({isOpen, handleModal}) => {
         value={formData.cost}
         onChange={handleChange}
         fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
         sx={{ mb: 2 }}
         error={showWarning && formData.cost === ''}
         helperText={showWarning && formData.cost === '' ? 'This field is required' : ''}

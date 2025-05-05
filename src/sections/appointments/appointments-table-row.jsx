@@ -60,6 +60,8 @@ export function AppointmentTableRow({ row, selected, onSelectRow }) {
     }
   };
 
+  console.log('appointment row:', row);
+
   const handleEdit = async () => {
     handleClosePopover();
 
@@ -94,15 +96,14 @@ export function AppointmentTableRow({ row, selected, onSelectRow }) {
     const selectedPatient = patients_data.find((p) => p.patient_id === editedRow.patient_id);
     const selectedDoctor = doctors_data.find((d) => d.doctor_id === editedRow.doctor_id);
 
-    // Ensure appointment_time is just a date string (yyyy-mm-dd)
-    const formattedAppointmentTime = editedRow.appointment_time.slice(0, 10);
+    const formattedAppointmentDate = editedRow.appointment_time.slice(0, 10); 
 
     const updatedAppointment = {
       appointment_id: editedRow.appointment_id,
       patient_id: editedRow.patient_id,
       doctor_id: editedRow.doctor_id,
-      appointment_time: formattedAppointmentTime, 
       status: editedRow.status,
+      appointment_time: formattedAppointmentDate, 
       patient_first_name: selectedPatient
         ? selectedPatient.first_name
         : editedRow.patient_first_name,
@@ -110,8 +111,6 @@ export function AppointmentTableRow({ row, selected, onSelectRow }) {
       doctor_first_name: selectedDoctor ? selectedDoctor.first_name : editedRow.doctor_first_name,
       doctor_last_name: selectedDoctor ? selectedDoctor.last_name : editedRow.doctor_last_name,
     };
-
-    console.log('The appointment we want to send', updatedAppointment);
 
     const result = await dispatch(updateAppointment(updatedAppointment));
 
@@ -214,6 +213,7 @@ export function AppointmentTableRow({ row, selected, onSelectRow }) {
           )}
         </TableCell>
 
+
         <TableCell>
           {isEditing ? (
             <TextField
@@ -285,8 +285,8 @@ AppointmentTableRow.propTypes = {
     appointment_id: PropTypes.number.isRequired,
     patient_id: PropTypes.number.isRequired,
     doctor_id: PropTypes.number.isRequired,
-    appointment_time: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
+    appointment_time: PropTypes.string.isRequired,
     patient_first_name: PropTypes.string.isRequired,
     patient_last_name: PropTypes.string.isRequired,
     doctor_first_name: PropTypes.string.isRequired,

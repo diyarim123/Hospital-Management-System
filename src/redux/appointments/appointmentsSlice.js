@@ -12,7 +12,14 @@ const initialState = {
 
 const AppointmentsSlice = createSlice({
   name: 'appointments',
-  initialState,
+  initialState, 
+  reducers: {
+    reset: (state) => {
+      state.appointments_loading = false;
+      state.appointments_data = [];
+      state.appointments_err = '';
+    },
+  },
   extraReducers: (builder) => {
     // Fetch Appointments
     builder.addCase(getAppointments.pending, (state) => {
@@ -36,7 +43,7 @@ const AppointmentsSlice = createSlice({
     });
     builder.addCase(postAppointment.fulfilled, (state, action) => {
       state.appointments_loading = false;
-      state.appointments_data = [...state.appointments_data, action.payload];
+      state.appointments_data = [...state.appointments_data, action.payload.data];
     });
     builder.addCase(postAppointment.rejected, (state, action) => {
       state.appointments_loading = false;
@@ -66,7 +73,7 @@ const AppointmentsSlice = createSlice({
     });
     builder.addCase(deleteAppointment.fulfilled, (state, action) => {
       state.appointments_loading = false;
-      state.appointments_data = state.appointments_data.filter((appointment) => appointment.id !== action.payload);
+      state.appointments_data = state.appointments_data.filter((appointment) => appointment.appointment_id !== action.payload);
     });
     builder.addCase(deleteAppointment.rejected, (state, action) => {
       state.appointments_loading = false;
@@ -75,4 +82,5 @@ const AppointmentsSlice = createSlice({
   },
 });
 
+export const { reset } = AppointmentsSlice.actions;
 export default AppointmentsSlice.reducer;

@@ -221,8 +221,8 @@ export const exportRecordsToPDF = (dataFiltered) => {
     record.record_date
       ? new Date(record.record_date).toISOString().substring(0, 10)
       : 'N/A',
-      `${record.patient_first_name} + ${record.patient.last_name}`,
-      `${record.doctor_first_name} + ${record.doctor.last_name}`,
+      `${record.patient_first_name} ${record.patient_last_name}`,
+      `${record.doctor_first_name} ${record.doctor_last_name}`,
   ]);
 
   autoTable(doc, {
@@ -235,6 +235,39 @@ export const exportRecordsToPDF = (dataFiltered) => {
   });
 
   doc.save('records.pdf');
+};
+
+export const exportBillingsToPDF = (dataFiltered) => {
+  const doc = new JsPDF(); 
+
+  doc.text('Billings List', 14, 16);
+
+  const tableColumn = [
+    "Amount",
+    "Payment Status",
+    "Patient Name",
+    "Bill Date",
+  ];
+
+  const tableRows = dataFiltered.map((bill) => [
+    bill.amount,
+    bill.payment_status,
+    `${bill.patient_first_name} ${bill.patient_last_name}`,
+    bill.bill_date
+    ? new Date(bill.bill_date).toISOString().substring(0, 10)
+    : 'N/A',
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 22,
+    theme: 'grid',
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+  });
+
+  doc.save('billings.pdf');
 };
 
 export const exportAppointmentsToPDF = (dataFiltered) => {
@@ -254,8 +287,8 @@ export const exportAppointmentsToPDF = (dataFiltered) => {
     appointment.appointment_time
       ? new Date(appointment.appointment_time).toISOString().substring(0, 10)
       : 'N/A',
-    `${appointment.patient_first_name} + ${appointment.patient.last_name}`,
-    `${appointment.doctor_first_name} + ${appointment.doctor.last_name}`,
+    `${appointment.patient_first_name} ${appointment.patient_last_name}`,
+    `${appointment.doctor_first_name} ${appointment.doctor_last_name}`,
   ]);
 
   autoTable(doc, {

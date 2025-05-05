@@ -13,6 +13,13 @@ const initialState = {
 const ServicesSlice = createSlice({
   name: 'services',
   initialState,
+  reducers: {
+    reset: (state) => {
+      state.services_loading = false;
+      state.services_data = [];
+      state.services_err = '';
+    },
+  },
   extraReducers: (builder) => {
     // Fetch services
     builder.addCase(getServices.pending, (state) => {
@@ -76,4 +83,5 @@ const ServicesSlice = createSlice({
   },
 });
 
+export const { reset } = ServicesSlice.actions;
 export default ServicesSlice.reducer;

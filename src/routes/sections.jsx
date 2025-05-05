@@ -24,6 +24,7 @@ export const ServicePage = lazy(() => import("../pages/services"));
 export const DepartmentPage = lazy(() => import("../pages/departments"));
 export const RecordPage = lazy(() => import("../pages/records"));
 export const AppointmentPage = lazy(() => import("../pages/appointments"));
+export const BillingPage = lazy(() => import("../pages/billings"));
 export const RoomPage = lazy(() => import("../pages/rooms"));
 export const Page404 = lazy(() => import("../pages/page-not-found"));
 
@@ -88,7 +89,8 @@ export function Router() {
             { path: "departments", element: <DepartmentPage /> },
             { path: "rooms", element: <RoomPage /> },
             { path: "records", element: <RecordPage /> },
-            { path: "appointments", element: <AppointmentPage /> }
+            { path: "appointments", element: <AppointmentPage /> },
+            { path: "billings", element: <BillingPage />}
           ],
         },
       ],

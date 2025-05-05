@@ -17,7 +17,6 @@ import MedicalSlice from './redux/medical_records/medicalSlice';
 import StaffSlice from './redux/staff/staffSlice';
 import BillingsSlice from './redux/billings/billingsSlice';
 import RoomsSlice from './redux/rooms/roomsSlice';
-import AssignmentsSlice from './redux/assignments/assignmentsSlice';
 import ServicesSlice from './redux/services/servicesSlice';
 
 import App from './app';
@@ -32,7 +31,6 @@ const store = configureStore({
     staff: StaffSlice,
     billings: BillingsSlice,
     rooms: RoomsSlice,
-    assignments: AssignmentsSlice,
     services: ServicesSlice,
     departments: DepartmentsSlice,
   },

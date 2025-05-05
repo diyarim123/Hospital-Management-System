@@ -13,6 +13,13 @@ const initialState = {
 const PatientsSlice = createSlice({
   name: 'patients',
   initialState,
+  reducers: {
+    reset: (state) => {
+      state.patients_loading = false;
+      state.patients_data = [];
+      state.patients_err = '';
+    },
+  },
   extraReducers: (builder) => {
     // Fetch Patients
     builder.addCase(getPatients.pending, (state) => {
@@ -76,4 +83,5 @@ const PatientsSlice = createSlice({
   },
 });
 
+export const { reset } = PatientsSlice.actions;
 export default PatientsSlice.reducer;

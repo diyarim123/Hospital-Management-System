@@ -16,13 +16,12 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
 import { Iconify } from '../../components/iconify';
-import { deleteMedical, updateMedical } from '../../redux/medical_records/medicalRequests';
+import { deleteBilling, updateBilling } from '../../redux/billings/billingRequests';
 import { getPatients } from '../../redux/patients/patientRequests';
-import { getDoctors } from '../../redux/doctors/doctorsRequests';
 
-// ----------------------------------------------------------------------
+const statusOptions = ['Paid', 'Not Paid', 'Insurance'];
 
-export function RecordTableRow({ row, selected, onSelectRow }) {
+export function BillingTableRow({ row, selected, onSelectRow }) {
   const [openPopover, setOpenPopover] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedRow, setEditedRow] = useState({ ...row });
@@ -30,10 +29,8 @@ export function RecordTableRow({ row, selected, onSelectRow }) {
   const dispatch = useDispatch();
 
   const { patients_data } = useSelector((state) => state.patients);
-  const { doctors_data } = useSelector((state) => state.doctors);
 
   const [patientsLoaded, setPatientsLoaded] = useState(false);
-  const [doctorsLoaded, setDoctorsLoaded] = useState(false);
 
   const handleOpenPopover = useCallback((event) => {
     setOpenPopover(event.currentTarget);
@@ -45,8 +42,8 @@ export function RecordTableRow({ row, selected, onSelectRow }) {
 
   const handleDelete = async (id) => {
     try {
-      await dispatch(deleteMedical(id));
-      toast.success('Record deleted successfully', {
+      await dispatch(deleteBilling(id));
+      toast.success('Bill deleted successfully', {
         position: 'top-center',
         autoClose: 2000,
         theme: 'light',
@@ -60,20 +57,13 @@ export function RecordTableRow({ row, selected, onSelectRow }) {
     }
   };
 
-  console.log('Medical row:', row);
-
   const handleEdit = async () => {
     handleClosePopover();
 
     const patientsResult = await dispatch(getPatients());
-    const doctorsResult = await dispatch(getDoctors());
 
-    if (
-      patientsResult.meta.requestStatus === 'fulfilled' &&
-      doctorsResult.meta.requestStatus === 'fulfilled'
-    ) {
+    if (patientsResult.meta.requestStatus === 'fulfilled') {
       setPatientsLoaded(true);
-      setDoctorsLoaded(true);
       setIsEditing(true);
     } else {
       toast.error('Failed to load data', {
@@ -94,46 +84,27 @@ export function RecordTableRow({ row, selected, onSelectRow }) {
 
   const handleSave = async () => {
     const selectedPatient = patients_data.find((p) => p.patient_id === editedRow.patient_id);
-    const selectedDoctor = doctors_data.find((d) => d.doctor_id === editedRow.doctor_id);
 
-    const formattedRecordDate = editedRow.record_date.slice(0, 10); 
-
-    const updatedRecord = {
-      record_id: editedRow.record_id,
+    const updatedBill = {
+      bill_id: editedRow.bill_id,
       patient_id: editedRow.patient_id,
-      doctor_id: editedRow.doctor_id,
-      diagnosis: editedRow.diagnosis,
-      treatment: editedRow.treatment,
-      prescription: editedRow.prescription,
-      record_date: formattedRecordDate, 
+      amount: editedRow.amount,
+      payment_status: editedRow.payment_status,
+      bill_date: editedRow.bill_date.slice(0, 10),
       patient_first_name: selectedPatient
         ? selectedPatient.first_name
         : editedRow.patient_first_name,
       patient_last_name: selectedPatient ? selectedPatient.last_name : editedRow.patient_last_name,
-      doctor_first_name: selectedDoctor ? selectedDoctor.first_name : editedRow.doctor_first_name,
-      doctor_last_name: selectedDoctor ? selectedDoctor.last_name : editedRow.doctor_last_name,
     };
 
-    const result = await dispatch(updateMedical(updatedRecord));
+    const result = await dispatch(updateBilling(updatedBill));
 
     if (result.meta.requestStatus === 'fulfilled') {
       setIsEditing(false);
-      toast.success('Record updated successfully', {
+      toast.success('Bill updated successfully', {
         position: 'top-center',
         autoClose: 2000,
         theme: 'light',
-      });
-
-      setEditedRow({
-        ...editedRow,
-        patient_first_name: selectedPatient
-          ? selectedPatient.first_name
-          : editedRow.patient_first_name,
-        patient_last_name: selectedPatient
-          ? selectedPatient.last_name
-          : editedRow.patient_last_name,
-        doctor_first_name: selectedDoctor ? selectedDoctor.first_name : editedRow.doctor_first_name,
-        doctor_last_name: selectedDoctor ? selectedDoctor.last_name : editedRow.doctor_last_name,
       });
     } else {
       toast.error('Update failed!', {
@@ -178,54 +149,36 @@ export function RecordTableRow({ row, selected, onSelectRow }) {
 
         <TableCell>
           {isEditing ? (
-            doctorsLoaded ? (
-              <TextField
-                select
-                size="small"
-                name="doctor_id"
-                value={editedRow.doctor_id}
-                onChange={handleChange}
-                fullWidth
-              >
-                {doctors_data.map((doctor) => (
-                  <MenuItem key={doctor.doctor_id} value={doctor.doctor_id}>
-                    {doctor.first_name} {doctor.last_name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            ) : (
-              <TextField size="small" disabled value="Loading doctors..." />
-            )
-          ) : (
-            `${row.doctor_first_name} ${row.doctor_last_name}`
-          )}
-        </TableCell>
-
-        <TableCell>
-          {isEditing ? (
             <TextField
               size="small"
-              name="diagnosis"
-              value={editedRow.diagnosis || ''}
+              name="amount"
+              value={editedRow.amount}
               onChange={handleChange}
               fullWidth
             />
           ) : (
-            row.diagnosis
+            row.amount
           )}
         </TableCell>
 
         <TableCell>
           {isEditing ? (
             <TextField
+              select
               size="small"
-              name="treatment"
-              value={editedRow.treatment || ''}
+              name="payment_status"
+              value={editedRow.payment_status}
               onChange={handleChange}
               fullWidth
-            />
+            >
+              {statusOptions.map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
+            </TextField>
           ) : (
-            row.treatment
+            row.payment_status
           )}
         </TableCell>
 
@@ -233,28 +186,14 @@ export function RecordTableRow({ row, selected, onSelectRow }) {
           {isEditing ? (
             <TextField
               size="small"
-              name="prescription"
-              value={editedRow.prescription || ''}
-              onChange={handleChange}
-              fullWidth
-            />
-          ) : (
-            row.prescription
-          )}
-        </TableCell>
-
-        <TableCell>
-          {isEditing ? (
-            <TextField
-              size="small"
-              name="record_date"
+              name="bill_date"
               type="date"
-              value={editedRow.record_date.slice(0, 10)}
+              value={editedRow.bill_date?.slice(0, 10)}
               onChange={handleChange}
               fullWidth
             />
           ) : (
-            row.record_date.slice(0, 10)
+            row.bill_date?.slice(0, 10)
           )}
         </TableCell>
 
@@ -299,7 +238,7 @@ export function RecordTableRow({ row, selected, onSelectRow }) {
             Edit
           </MenuItem>
 
-          <MenuItem onClick={() => handleDelete(row.record_id)} sx={{ color: 'error.main' }}>
+          <MenuItem onClick={() => handleDelete(row.bill_id)} sx={{ color: 'error.main' }}>
             <Iconify icon="solar:trash-bin-trash-bold" />
             Delete
           </MenuItem>
@@ -309,19 +248,15 @@ export function RecordTableRow({ row, selected, onSelectRow }) {
   );
 }
 
-RecordTableRow.propTypes = {
+BillingTableRow.propTypes = {
   row: PropTypes.shape({
-    record_id: PropTypes.number.isRequired,
+    bill_id: PropTypes.number.isRequired,
     patient_id: PropTypes.number.isRequired,
-    doctor_id: PropTypes.number.isRequired,
-    diagnosis: PropTypes.string.isRequired,
-    treatment: PropTypes.string.isRequired,
-    prescription: PropTypes.string.isRequired,
-    record_date: PropTypes.string.isRequired,
+    amount: PropTypes.string.isRequired,
+    payment_status: PropTypes.string.isRequired,
+    bill_date: PropTypes.string.isRequired,
     patient_first_name: PropTypes.string.isRequired,
     patient_last_name: PropTypes.string.isRequired,
-    doctor_first_name: PropTypes.string.isRequired,
-    doctor_last_name: PropTypes.string.isRequired,
   }).isRequired,
   selected: PropTypes.bool.isRequired,
   onSelectRow: PropTypes.func.isRequired,

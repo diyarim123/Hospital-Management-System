@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { DashboardContent } from '../../../layouts/dashboard';
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
-
+// importing getting functions
 import { getPatients } from '../../../redux/patients/patientRequests';
 import { getDoctors } from '../../../redux/doctors/doctorsRequests';
 import { getStaff } from '../../../redux/staff/staffRequests';
@@ -13,9 +13,19 @@ import { getDepartments } from '../../../redux/departments/departmentRequests';
 import { getMedicals } from '../../../redux/medical_records/medicalRequests';
 import { getServices } from '../../../redux/services/serviceRequests';
 import { getRooms } from '../../../redux/rooms/roomRequests';
-import { getAssignments } from '../../../redux/assignments/assignmentRequests';
 import { getAppointments } from '../../../redux/appointments/appointmentsRequests';
 import { getBillings } from '../../../redux/billings/billingRequests';
+
+// importing resetting functions
+import { reset as resetPatients } from "../../../redux/patients/patientsSlice";
+import { reset as resetDoctors } from "../../../redux/doctors/doctorsSlice";
+import { reset as resetStaff } from "../../../redux/staff/staffSlice";
+import { reset as resetDepartments } from "../../../redux/departments/departmentsSlice";
+import { reset as resetMedicals } from "../../../redux/medical_records/medicalSlice";
+import { reset as resetServices } from "../../../redux/services/servicesSlice";
+import { reset as resetRooms } from "../../../redux/rooms/roomsSlice";
+import { reset as resetAppointments } from "../../../redux/appointments/appointmentsSlice";
+import { reset as resetBillings } from "../../../redux/billings/billingsSlice";
 
 // ----------------------------------------------------------------------
 
@@ -31,23 +41,52 @@ export function OverviewAnalyticsView() {
     dispatch(getMedicals());
     dispatch(getServices());
     dispatch(getRooms());
-    dispatch(getAssignments());
     dispatch(getAppointments());
     dispatch(getBillings());
+
+    return () => {
+      dispatch(resetPatients());
+      dispatch(resetDoctors())
+      dispatch(resetStaff())
+      dispatch(resetDepartments())
+      dispatch(resetMedicals())
+      dispatch(resetServices())
+      dispatch(resetRooms())
+      dispatch(resetAppointments())
+      dispatch(resetBillings())
+    };
   }, [dispatch]);
 
   // Select data lengths
-  const { patients_data } = useSelector((state) => state.patients);
-  const { doctors_data } = useSelector((state) => state.doctors);
-  const { staff_data } = useSelector((state) => state.staff);
-  const { departments_data } = useSelector((state) => state.departments);
-  const { medicals_data } = useSelector((state) => state.medicals);
-  const { services_data } = useSelector((state) => state.services);
-  const { rooms_data } = useSelector((state) => state.rooms);
-  const { assignments_data } = useSelector((state) => state.assignments);
-  const { appointments_data } = useSelector((state) => state.appointments);
-  const { billings_data} = useSelector((state) => state.billings);
+  const { patients_loading, patients_data } = useSelector((state) => state.patients);
+  const { doctors_loading, doctors_data } = useSelector((state) => state.doctors);
+  const { staff_loading, staff_data } = useSelector((state) => state.staff);
+  const { departments_loading, departments_data } = useSelector((state) => state.departments);
+  const { medicals_loading, medicals_data } = useSelector((state) => state.medicals);
+  const { services_loading, services_data } = useSelector((state) => state.services);
+  const { rooms_loading, rooms_data } = useSelector((state) => state.rooms);
+  const { appointments_loading, appointments_data } = useSelector((state) => state.appointments);
+  const { billings_loading, billings_data} = useSelector((state) => state.billings);
 
+
+  const isLoading =
+  patients_loading ||
+  doctors_loading ||
+  staff_loading ||
+  departments_loading ||
+  medicals_loading ||
+  services_loading ||
+  rooms_loading ||
+  appointments_loading ||
+  billings_loading;
+
+  if (isLoading) {
+    return (
+      <DashboardContent maxWidth="xl">
+        <Typography variant="h6">Loading Dashboard...</Typography>
+      </DashboardContent>
+    );
+  }  
 
   return (
     <DashboardContent maxWidth="xl">
@@ -163,20 +202,6 @@ export function OverviewAnalyticsView() {
             chart={{
               categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
               series: [53, 30, 37, 54, 28, 40, 33, 73],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
-          <AnalyticsWidgetSummary
-            title="Room Assignments"
-            percent={51.8}
-            total={assignments_data?.length || 0}
-            color="info"
-            icon={<img alt="icon" src="/assets/icons/glass/approve.png" />}
-            chart={{
-              categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-              series: [62, 56, 15, 29, 23, 78, 32, 63],
             }}
           />
         </Grid>

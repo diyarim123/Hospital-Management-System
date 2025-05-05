@@ -13,6 +13,13 @@ const initialState = {
 const RoomsSlice = createSlice({
   name: 'rooms',
   initialState,
+  reducers: {
+    reset: (state) => {
+      state.rooms_loading = false;
+      state.rooms_data = [];
+      state.rooms_err = '';
+    },
+  },
   extraReducers: (builder) => {
     // Fetch Rooms
     builder.addCase(getRooms.pending, (state) => {
@@ -76,4 +83,5 @@ const RoomsSlice = createSlice({
   },
 });
 
+export const { reset } = RoomsSlice.actions;
 export default RoomsSlice.reducer;
